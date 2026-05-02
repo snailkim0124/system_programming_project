@@ -6,8 +6,17 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <termio.h>
+#include <ncurses.h>
+#include <locale.h>
+#include <string.h>
 
-#define MAX_INPUT_LEN 1024  # 최대 입력 길이
-#define MAX_ARGS 64         # 최대 인자 개수
+typedef struct {
+    int y, x;        
+    int width;       
+    char label[10];  
+    int keycode;     
+} Key;
+
 
 #endif
