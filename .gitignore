@@ -1,0 +1,13 @@
+# 1. 컴파일된 목적 파일과 실행 파일
+*.o
+*.out
+*.exe
+
+# 2. 본인이 만들 실행 파일 이름 (예시)
+myshell
+server
+client
+
+# 3. 에디터/OS 설정 파일 (팀원들끼리 충돌 방지)
+.vscode/
+.DS_Store
