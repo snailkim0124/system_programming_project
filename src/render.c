@@ -1,6 +1,5 @@
 #include "render.h"
 
-// 우측 끝이 x=57에 딱 맞도록 정밀하게 계산된 배열입니다.
 Key main_keyboard[] = {
     // Row 0 (Function Keys)
     { 2,  2, 7,  "ESC",   27 },
@@ -8,6 +7,7 @@ Key main_keyboard[] = {
     { 2, 18, 6,  "F2",    KEY_F(2) },
     { 2, 25, 6,  "F3",    KEY_F(3) },
     { 2, 32, 6,  "F4",    KEY_F(4) },
+    { 2, 39, 6,  "F5",    KEY_F(5) },
 
     // Row 1 (Numbers) - 총 너비 55 (2~57)
     { 5,  2, 5,  "`",     '`' },
@@ -21,43 +21,49 @@ Key main_keyboard[] = {
     { 5, 42, 5,  "8",     '8' },
     { 5, 47, 5,  "9",     '9' },
     { 5, 52, 5,  "0",     '0' },
+    { 5, 57, 8,  "BSP",   KEY_BACKSPACE },
 
     // Row 2 (QWE...)
-    { 7,  2, 7,  "TAB",   '\t' }, 
-    { 7,  9, 5,  "Q",     'q' },
-    { 7, 14, 5,  "W",     'w' },
-    { 7, 19, 5,  "E",     'e' },
-    { 7, 24, 5,  "R",     'r' },
-    { 7, 29, 5,  "T",     't' },
-    { 7, 34, 5,  "Y",     'y' },
-    { 7, 39, 5,  "U",     'u' },
-    { 7, 44, 5,  "I",     'i' },
-    { 7, 49, 8,  "BSP",   KEY_BACKSPACE }, // 너비 조정으로 우측 끝 맞춤
+    { 8,  2, 7,  "TAB",   '\t' }, 
+    { 8,  9, 5,  "Q",     'q',  1,  0 },
+    { 8, 14, 5,  "W",     'w',  1,  1 },
+    { 8, 19, 5,  "E",     'e',  1,  1 },
+    { 8, 24, 5,  "R",     'r',  1,  1 },
+    { 8, 29, 5,  "T",     't',  1,  1 },
+    { 8, 34, 5,  "Y",     'y',  1,  1 },
+    { 8, 39, 5,  "U",     'u',  1,  1 },
+    { 8, 44, 5,  "I",     'i',  1,  1 },
+    { 8, 49, 5,  "O",     'o',  1,  1 },
+    { 8, 54, 5,  "P",     'p',  1,  1 },
 
     // Row 3 (ASD...)
-    { 9,  2, 8,  "CTRL",  26 },    
-    { 9, 10, 5,  "A",     'a' },
-    { 9, 15, 5,  "S",     's' },
-    { 9, 20, 5,  "D",     'd' },
-    { 9, 25, 5,  "F",     'f' },
-    { 9, 30, 5,  "G",     'g' },
-    { 9, 35, 5,  "H",     'h' },
-    { 9, 40, 5,  "J",     'j' },
-    { 9, 45, 12, "ENTER", '\n' },  // 너비 조정으로 우측 끝 맞춤
+    { 11,  2, 8,  "CAPS",  10 },    
+    { 11, 10, 5,  "A",     'a',  1,  0 },
+    { 11, 15, 5,  "S",     's',  1,  1 },
+    { 11, 20, 5,  "D",     'd',  1,  1 },
+    { 11, 25, 5,  "F",     'f',  1,  1 },
+    { 11, 30, 5,  "G",     'g',  1,  1 },
+    { 11, 35, 5,  "H",     'h',  1,  1 },
+    { 11, 40, 5,  "J",     'j',  1,  1 },
+    { 11, 45, 5,  "K",     'k',  1,  1 },
+    { 11, 50, 5,  "L",     'l',  1,  1 },
+    { 11, 55, 10, "ENTER", '\n' },  
 
-    // Row 4 (ZXC...) - 요청하신 Z열 추가!
-    { 11,  2, 10, "SHIFT", -1 },   // Left Shift
-    { 11, 12, 5,  "Z",     'z' },
-    { 11, 17, 5,  "X",     'x' },
-    { 11, 22, 5,  "C",     'c' },
-    { 11, 27, 5,  "V",     'v' },
-    { 11, 32, 5,  "B",     'b' },
-    { 11, 37, 5,  "N",     'n' },
-    { 11, 42, 5,  "M",     'm' },
-    { 11, 47, 10, "SHIFT", -1 },   // Right Shift
+    // Row 4 (ZXC...)
+    { 14,  2, 10, "SHIFT", -1 },   // Left Shift
+    { 14, 12, 5,  "Z",     'z',  1,  0 },
+    { 14, 17, 5,  "X",     'x',  1,  1 },
+    { 14, 22, 5,  "C",     'c',  1,  1 },
+    { 14, 27, 5,  "V",     'v',  1,  1 },
+    { 14, 32, 5,  "B",     'b',  1,  1 },
+    { 14, 37, 5,  "N",     'n',  1,  1 },
+    { 14, 42, 5,  "M",     'm',  1,  1 },
+    { 14, 47, 10, "SHIFT", -1 },   // Right Shift
 
     // Row 5 (Spacebar)
-    { 13, 15, 27, "SPACE", ' ' }   // 스페이스바 추가
+    { 17, 2, 8, "CTRL", 162 },
+    { 17, 10, 5, "WIN", 162 },
+    { 17, 15, 27, "SPACE", ' ' },
 };
 
 #define NUM_KEYS (sizeof(main_keyboard) / sizeof(Key))
@@ -69,6 +75,11 @@ void draw_single_key(Key* key, int highlighted) {
 
     if (highlighted) attron(A_REVERSE);
 
+    // 땅인 경우 갈색으로
+    if(key->is_soil) {
+        attron(COLOR_PAIR(1));
+    }
+    
     // 상단 선
     mvaddch(y, x, ACS_ULCORNER);
     for (int i = 0; i < w - 2; i++) addch(ACS_HLINE);
@@ -80,7 +91,7 @@ void draw_single_key(Key* key, int highlighted) {
     int label_len = strlen(key->label);
     int padding = (w - 2 - label_len) / 2;
     for(int i=0; i<padding; i++) addch(' ');
-    printw("%s", key->label);
+    printw("%s", key->is_locked ? "#" : key->label);
     for(int i=0; i< (w - 2 - label_len - padding); i++) addch(' ');
 
     mvaddch(y + 1, x + w - 1, ACS_VLINE);
@@ -90,18 +101,53 @@ void draw_single_key(Key* key, int highlighted) {
     for (int i = 0; i < w - 2; i++) addch(ACS_HLINE);
     addch(ACS_LRCORNER);
 
+    if(key->is_soil) {
+        attroff(COLOR_PAIR(1));
+    }
     if (highlighted) attroff(A_REVERSE);
 }
 
 void draw_keyboard(int pressed_keycode) {
     erase(); 
-    mvprintw(0, 2, "Z열과 스페이스바가 추가된 키보드 (종료: 'q' 두 번 또는 ESC)");
+    mvprintw(0, 2, "농장게임 (종료: ESC)");
     
     for (int i = 0; i < NUM_KEYS; i++) {
         int is_pressed = (main_keyboard[i].keycode == pressed_keycode);
         draw_single_key(&main_keyboard[i], is_pressed);
     }
+
+    mvprintw(20, 2, "F1 : 인벤토리\tF2 : 상점\tF3 : 농장");
+
     refresh();
+}
+
+void draw_inventory(Player *player) {
+    int start_y = 22, start_x = 10;
+    int height = 12, width = 40;
+
+    // 인벤토리 외곽 박스
+    attron(COLOR_PAIR(2)); // 금색 혹은 다른 색상
+    for (int i = 0; i < height; i++) {
+        mvprintw(start_y + i, start_x, "│                                      │");
+    }
+    mvprintw(start_y, start_x, "┌─────────── INVENTORY ────────────┐");
+    mvprintw(start_y + height - 1, start_x, "└──────────────────────────────────┘");
+    attroff(COLOR_PAIR(2));
+
+    // 아이템 목록 출력
+    for (int i = 0; i < MAX_ITEMS; i++) {
+        if (i == player->inv.selected_slot) {
+            attron(A_REVERSE); // 선택된 칸 강조
+        }
+        mvprintw(start_y + 2 + i, start_x + 4, "[%d] %-15s : %d 개", 
+                 i + 1, player->inv.items[i].name, player->inv.items[i].count);
+        if (i == player->inv.selected_slot) {
+            attroff(A_REVERSE);
+        }
+    }
+
+    mvprintw(start_y + height - 3, start_x + 4, "현재 잔액: %d G", player->inv.money);
+    mvprintw(start_y + height - 2, start_x + 4, "(닫기: F1 / 이동: 화살표)");
 }
 
 void init_terminal() {
@@ -111,6 +157,10 @@ void init_terminal() {
     noecho();             
     keypad(stdscr, TRUE); 
     curs_set(0);   
+    // 색깔 부분
+    start_color();
+    use_default_colors();
+    init_pair(1, 94, -1); // 94번은 갈색 계열, -1은 투명 배경
 }
 
 void close_terminal() {
