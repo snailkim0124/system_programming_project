@@ -1,6 +1,8 @@
 #include "render.h"
 #include "player.h"
 
+int shop_idx = 0;
+
 int main() {
     init_terminal();
     player_init();
@@ -15,14 +17,25 @@ int main() {
 
         if (ch == KEY_F(1)) {
             player.is_inventory_open = !player.is_inventory_open;
+            player.is_store_open = false;
+        }
+        else if(ch == KEY_F(2)) {
+            player.is_store_open = !player.is_store_open;
+            player.is_inventory_open = false;
         }
 
         if(player.is_inventory_open) {
             if (ch == KEY_UP && player.inv.selected_slot > 0) player.inv.selected_slot--;
             if (ch == KEY_DOWN && player.inv.selected_slot < MAX_ITEMS - 1) player.inv.selected_slot++;
 
-            draw_keyboard(-1); // 배경 깔아주기
-            draw_inventory(&player);
+            draw_keyboard(-1); 
+            draw_subwindow(&player, player.inv.selected_slot);
+        }
+        else if (player.is_store_open) {
+            if (ch == KEY_UP && shop_idx > 0) shop_idx--;
+            if (ch == KEY_DOWN && shop_idx < SHOP_ITEM_COUNT - 1) shop_idx++;
+            draw_keyboard(-1); 
+            draw_subwindow(&player, shop_idx);
         }
         else {
             draw_keyboard(ch);
