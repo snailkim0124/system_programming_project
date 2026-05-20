@@ -11,6 +11,7 @@ void player_init() {
     strcpy(player.inv.items[0].name, "carrot");
     player.inv.items[0].count = 5;
     strcpy(player.ast_msg, "");
+    player.inv.current_item_count = 1;
 }
 
 void buy_item(Player *p, int shop_idx) {
@@ -35,6 +36,7 @@ void buy_item(Player *p, int shop_idx) {
                 if(p->inv.items[i].count == 0) {
                     strcpy(p->inv.items[i].name, shop_stock[shop_idx].name);
                     p->inv.items[i].count = 1;
+                    p->inv.current_item_count++;
                     break;
                 }
             }
@@ -46,4 +48,8 @@ void buy_item(Player *p, int shop_idx) {
     else {
         sprintf(p->ast_msg, "돈이 부족합니다! (현재 잔액: %d G)", player.inv.money);
     }
+}
+
+void plant_seed() {
+    printf("농작물 심기!!\n");
 }

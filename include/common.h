@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
-#define MAX_ITEMS 5
+#define MAX_ITEMS 20
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +34,7 @@ typedef struct {
     Item items[MAX_ITEMS];
     int money;
     int selected_slot; // 인벤토리 안에서 선택 중인 칸
+    int current_item_count; // 현재 가지고 있는 아이템 개수
 } Inventory;
 
 typedef struct {

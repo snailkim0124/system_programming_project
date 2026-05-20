@@ -29,17 +29,23 @@ int main() {
         }
 
         if(player.is_inventory_open) {
+            int max_slot = player.inv.current_item_count > 0 ? player.inv.current_item_count - 1 : 0;
+
             if (ch == KEY_UP && player.inv.selected_slot > 0) {
                 player.inv.selected_slot--;
                 strcpy(player.ast_msg, ""); // 메시지 초기화
             }
-            if (ch == KEY_DOWN && player.inv.selected_slot < MAX_ITEMS - 1) {
+            if (ch == KEY_DOWN && player.inv.selected_slot < max_slot) {
                 player.inv.selected_slot++;
                 strcpy(player.ast_msg, ""); // 메시지 초기화
             } 
 
+            if(ch == '\n') {
+                plant_seed();
+            }
+
             draw_keyboard(-1); 
-            draw_subwindow(&player, player.inv.selected_slot);
+            draw_leftwindow(&player, player.inv.selected_slot);
         }
         else if (player.is_store_open) {
             if (ch == KEY_UP && shop_idx > 0) {
@@ -56,7 +62,7 @@ int main() {
             }
 
             draw_keyboard(-1); 
-            draw_subwindow(&player, shop_idx);
+            draw_leftwindow(&player, shop_idx);
         }
         else {
             draw_keyboard(ch);

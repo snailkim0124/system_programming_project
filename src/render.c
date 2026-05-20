@@ -67,10 +67,32 @@ Key main_keyboard[] = {
 };
 
 Store shop_stock[] = {
-    {"당근 씨앗", 50, "평범한 당근이다."},
-    {"감자 씨앗", 80, "강원도의 힘!"},
-    {"황금 씨앗", 500, "매우 비싼 작물."},
-    {"비료", 30, "성장 속도 UP"}
+    {"Asparagus", 0, ""},
+    {"Broccoli", 5, ""},
+    {"Carrot", 10, ""},
+    {"Dandelion", 20, ""},
+    {"Eggplant", 30, ""},
+    {"Fern", 40, "물을 주지 않아도 자란다"},
+    {"Garlic", 50, "병충해가 자라지 않는다"},
+    {"Herb", 60, ""},
+    {"Iris", 75, "황금작물로 자랄 경우 5배로 받는다"},
+    {"Jalapeno", 100, "절대 썩지 않는다"},
+    {"Kale", 125, ""},
+    {"Lettuce", 150, ""},
+    {"Mushroom", 200, "시간대 밤일 경우 성장속도가 2배"},
+    {"Nettle", 250, "수확 시 5번 눌러야 한다"},
+    {"Onion", 300, "병충해가 자라지 않는다"},
+    {"Potato", 350, "수확한 자리에 씨앗이 다시 심어진다"},
+    {"Quinoa", 400, ""},
+    {"Radish", 500, ""},
+    {"Spinach", 600, ""},
+    {"Tomato", 700, "성장 완료 후 30분만 지나도 썩는다"},
+    {"Ulluco", 800, "수확한 자리에 씨앗이 다시 심어진다"},
+    {"Vanilla", 900, ""},
+    {"Watercress", 1000, "물없는 상태가 30초 이상이면 썩는다"},
+    {"Xylosma", 1250, "분당 1%로 인접 방향으로 퍼진다"},
+    {"Yam", 1500, ""},
+    {"Zucchini", 2000, ""}
 };
 
 #define NUM_KEYS (sizeof(main_keyboard) / sizeof(Key))
@@ -123,21 +145,48 @@ void draw_keyboard(int pressed_keycode) {
         draw_single_key(&main_keyboard[i], is_pressed);
     }
 
-    mvprintw(20, 2, "F1 : 인벤토리\tF2 : 상점\tF3 : 농장");
+    mvprintw(20, 2, "F1 : 인벤토리\tF2 : 상점\tF3 : 농장\t현재 잔액 : %d G", player.inv.money);
 
     refresh();
 }
 
 void draw_inventory(int start_y, int start_x) {
     // 아이템 목록 출력
-    for (int i = 0; i < MAX_ITEMS; i++) {
-        if (i == player.inv.selected_slot) {
-            attron(A_REVERSE); // 선택된 칸 강조
+    int total_items = (player.inv.current_item_count > 5) ? player.inv.current_item_count : 5;
+    int selected_idx = player.inv.selected_slot;
+
+    // 스크롤 시작 위치 계산 (위아래 2개씩 보이게)
+    int start_idx = selected_idx - 2;
+    if (start_idx < 0) start_idx = 0;
+
+    // 총 아이템 개수가 5개보다 적을 때
+    if (total_items <= 5) {
+        start_idx = 0;
+    }
+    else if (start_idx + 5 > total_items) {
+        start_idx = total_items - 5;
+    }
+
+    // 딱 5개만 출력
+    for (int i = 0; i < 5; i++) {
+        int item_idx = start_idx + i;
+        if (item_idx >= total_items) break; // 혹시 모를 범위 초과 방지
+
+        // 빈 슬롯 이름 처리
+        char item_name[25];
+        strcpy(item_name, player.inv.items[item_idx].name);
+        if (strlen(item_name) == 0) strcpy(item_name, "(빈 슬롯)");
+
+        // 선택된 아이템 강조
+        if (item_idx == selected_idx) {
+            attron(A_REVERSE | A_BOLD);
         }
-        mvprintw(start_y + i, start_x + 4, "[%d] %-15s : %d 개", 
-                 i + 1, player.inv.items[i].name, player.inv.items[i].count);
-        if (i == player.inv.selected_slot) {
-            attroff(A_REVERSE);
+        
+        mvprintw(start_y + i, start_x + 4, "[%02d] %-15s : %2d 개", 
+                 item_idx + 1, item_name, player.inv.items[item_idx].count);
+        
+        if (item_idx == selected_idx) {
+            attroff(A_REVERSE | A_BOLD);
         }
     }
 
@@ -146,17 +195,39 @@ void draw_inventory(int start_y, int start_x) {
 }
 
 void draw_store(int start_y, int start_x, int selected_idx) {
-    // 2. 판매 목록 출력
-    for (int i = 0; i < SHOP_ITEM_COUNT; i++) {
-        if (i == selected_idx) attron(A_REVERSE); // 현재 선택된 물건
+    // 판매 목록 출력
+    int total_items = SHOP_ITEM_COUNT;
+
+    // 스크롤 시작 위치 계산
+    int start_idx = selected_idx - 2;
+    if (start_idx < 0) start_idx = 0;
+
+    // 총 아이템 개수가 5개보다 적을 때
+    if (total_items <= 5) {
+        start_idx = 0;
+    }
+    else if (start_idx + 5 > total_items) {
+        start_idx = total_items - 5;
+    }
+
+    // 딱 5개만 출력
+    for (int i = 0; i < 5; i++) {
+        int item_idx = start_idx + i;
+        if (item_idx >= total_items) break;
+
+        // 선택된 아이템 강조
+        if (item_idx == selected_idx) {
+            attron(A_REVERSE | A_BOLD);
+        }
         
-        mvprintw(start_y + i, start_x + 4, "[%d] %-15s | 가격: %3d G", 
-                 i + 1, shop_stock[i].name, shop_stock[i].price);
+        // 아이템 출력
+        mvprintw(start_y + i, start_x + 4, "[%02d] %-15s | %3d G", 
+                 item_idx + 1, shop_stock[item_idx].name, shop_stock[item_idx].price);
         
-        if (i == selected_idx) {
-            attroff(A_REVERSE);
-            // 선택된 아이템의 설명을 하단에 출력
-            mvprintw(start_y + WIN_HEIGHT - 6, start_x + 4, "설명: %s", shop_stock[i].explan);
+        if (item_idx == selected_idx) {
+            attroff(A_REVERSE | A_BOLD);
+            // 선택된 아이템의 설명도 하단에 띄우기
+            mvprintw(start_y + WIN_HEIGHT - 6, start_x + 4, "설명: %s", shop_stock[item_idx].explan);
         }
     }
 
@@ -164,10 +235,10 @@ void draw_store(int start_y, int start_x, int selected_idx) {
     mvprintw(start_y + WIN_HEIGHT - 4, start_x, "(닫기: F2 / 이동: 화살표)");
 }
 
-void draw_subwindow(Player *player, int selected_idx) {
+void draw_leftwindow(Player *player, int selected_idx) {
     if (player->is_inventory_open && player->is_store_open) return;
 
-    int start_y = 23, start_x = 10;
+    int start_y = 23, start_x = 3;
     int height = 12, width = 40; // 창 크기 고정
     char subtitle[20];
 
@@ -229,6 +300,46 @@ void draw_subwindow(Player *player, int selected_idx) {
         refresh();
     }
 
+    draw_rightwindow(player);
+}
+
+void draw_rightwindow(Player *player) {
+    if (player->is_inventory_open && player->is_store_open) return;
+
+    int start_y = 23, start_x = 45;
+    int height = 12, width = 20; // 창 크기 고정
+    char subtitle[20];
+
+    // 1. 제목 및 색상 결정
+    strcpy(subtitle, " INFO ");
+    int color = 2; // 상점용 다른 색
+
+    // 2. 외곽 박스 그리기
+    attron(COLOR_PAIR(color));
+    
+    // 상단 (제목 포함)
+    int title_len = strlen(subtitle);
+    int side_bar = (width - 2 - title_len) / 2;
+    
+    mvaddch(start_y, start_x, ACS_ULCORNER);
+    for(int i=0; i<side_bar; i++) addch(ACS_HLINE);
+    printw("%s", subtitle);
+    for(int i=0; i < (width - 2 - title_len - side_bar); i++) addch(ACS_HLINE);
+    addch(ACS_URCORNER);
+
+    // 몸통
+    for (int i = 1; i < height - 1; i++) {
+        mvaddch(start_y + i, start_x, ACS_VLINE);
+        for(int j=0; j < width - 2; j++) mvaddch(start_y + i, start_x + 1 + j, ' '); // 배경 지우기
+        mvaddch(start_y + i, start_x + width - 1, ACS_VLINE);
+    }
+
+    // 하단
+    mvaddch(start_y + height - 1, start_x, ACS_LLCORNER);
+    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
+    addch(ACS_LRCORNER);
+    
+    attroff(COLOR_PAIR(color));
 }
 
 void init_terminal() {
