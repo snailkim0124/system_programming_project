@@ -40,6 +40,7 @@ typedef struct {
     bool is_inventory_open; // 현재 인벤토리가 열려 있는지 확인
     bool is_store_open; // 현재 상점?
     bool is_farm_open; // 현재 농장?
+    char ast_msg[256]; // 경고 메시지
 } Player;
 
 extern Player player;

@@ -208,12 +208,27 @@ void draw_subwindow(Player *player, int selected_idx) {
     
     attroff(COLOR_PAIR(color));
 
-    // 3. 내용물 그리기 (프레임 안쪽 좌표를 넘겨주면 더 좋음)
+    // 3. 내용물 그리기
     if (player->is_inventory_open) {
         draw_inventory(start_y + 2, start_x + 2);
     } else if (player->is_store_open) {
         draw_store(start_y + 2, start_x + 2, selected_idx);
     }
+
+    //  경고 메시지가 있는 경우
+    if (strlen(player->ast_msg) > 0) {
+        if(strstr(player->ast_msg, "부족") != NULL) {
+            attron(COLOR_PAIR(2));
+            mvprintw(21, 3, "알림: %s", player->ast_msg); 
+            attroff(COLOR_PAIR(2));
+        }
+        else {
+            mvprintw(21, 3, "알림: %s", player->ast_msg); 
+        }
+
+        refresh();
+    }
+
 }
 
 void init_terminal() {
@@ -227,6 +242,7 @@ void init_terminal() {
     start_color();
     use_default_colors();
     init_pair(1, 94, -1); // 94번은 갈색 계열, -1은 투명 배경
+    init_pair(2, COLOR_RED, COLOR_BLACK);
 }
 
 void close_terminal() {

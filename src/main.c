@@ -19,21 +19,42 @@ int main() {
             player.is_inventory_open = !player.is_inventory_open;
             player.is_store_open = false;
         }
-        else if(ch == KEY_F(2)) {
+        else if (ch == KEY_F(2)) {
             player.is_store_open = !player.is_store_open;
+            player.is_inventory_open = false;
+        }
+        else if (ch == KEY_F(3)) {
+            player.is_store_open = false;
             player.is_inventory_open = false;
         }
 
         if(player.is_inventory_open) {
-            if (ch == KEY_UP && player.inv.selected_slot > 0) player.inv.selected_slot--;
-            if (ch == KEY_DOWN && player.inv.selected_slot < MAX_ITEMS - 1) player.inv.selected_slot++;
+            if (ch == KEY_UP && player.inv.selected_slot > 0) {
+                player.inv.selected_slot--;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            }
+            if (ch == KEY_DOWN && player.inv.selected_slot < MAX_ITEMS - 1) {
+                player.inv.selected_slot++;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            } 
 
             draw_keyboard(-1); 
             draw_subwindow(&player, player.inv.selected_slot);
         }
         else if (player.is_store_open) {
-            if (ch == KEY_UP && shop_idx > 0) shop_idx--;
-            if (ch == KEY_DOWN && shop_idx < SHOP_ITEM_COUNT - 1) shop_idx++;
+            if (ch == KEY_UP && shop_idx > 0) {
+                shop_idx--;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            }
+            if (ch == KEY_DOWN && shop_idx < SHOP_ITEM_COUNT - 1) {
+                shop_idx++;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            }
+
+            if(ch == '\n') {
+                buy_item(&player, shop_idx);
+            }
+
             draw_keyboard(-1); 
             draw_subwindow(&player, shop_idx);
         }
