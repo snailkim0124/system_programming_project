@@ -22,7 +22,7 @@ typedef struct {
     ////////////
     int is_soil; // 땅인지 아닌지
     int is_locked; // 땅이 잠겼는지
-    int crop_state; // 작물 상태
+    int crop_state; // 작물 상태 (, > + > z > Z > 색 변경(녹색, 노란색))
 } Key;
 
 typedef struct {

@@ -14,9 +14,7 @@ int main() {
     while (1) {
         ch = getch(); 
         if (ch == 27) {
-            if(draw_quit() == 1) {
-                break;
-            }
+            if (draw_quit() == 1) break;
             else clear();
         } 
 
@@ -50,7 +48,7 @@ int main() {
             }
 
             draw_keyboard(-1); 
-            draw_leftwindow(&player, player.inv.selected_slot);
+            draw_leftwindow(&player, -1);
         }
         else if (player.is_store_open) {
             if (ch == KEY_UP && shop_idx > 0) {

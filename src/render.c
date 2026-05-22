@@ -180,7 +180,23 @@ void draw_single_key(Key* key, int highlighted) {
     int label_len = strlen(key->label);
     int padding = (w - 2 - label_len) / 2;
     for(int i=0; i<padding; i++) addch(' ');
-    printw("%s", key->is_locked ? "#" : key->label);
+    if(key->is_locked) {
+        printw("#");
+    }
+    else if(isalpha(key->keycode)) {
+        if (key->crop_state == 1) {
+            printw(","); // 씨앗이 심어진 상태
+        } 
+        else if (key->crop_state == 2) {
+            printw("+"); // (나중을 위해 미리 만들어두는 새싹 상태)
+        }
+        else {
+            printw(" "); // 상태가 0(빈 땅)일 때는 원래대로 빈칸
+        }
+    }
+    else {
+        printw("%s", key->label);
+    }
     for(int i=0; i< (w - 2 - label_len - padding); i++) addch(' ');
 
     mvaddch(y + 1, x + w - 1, ACS_VLINE);
@@ -348,7 +364,8 @@ void draw_leftwindow(Player *player, int selected_idx) {
 
     //  경고 메시지가 있는 경우
     if (strlen(player->ast_msg) > 0) {
-        if(strstr(player->ast_msg, "부족") != NULL) {
+        // space 2번인 경우 빨간색 출력
+        if(strstr(player->ast_msg, "  ") != NULL) {
             attron(COLOR_PAIR(2));
             mvprintw(21, 3, "알림: %s", player->ast_msg); 
             attroff(COLOR_PAIR(2));
@@ -400,6 +417,9 @@ void draw_rightwindow(Player *player) {
     addch(ACS_LRCORNER);
     
     attroff(COLOR_PAIR(color));
+
+    // 정보 적기
+
 }
 
 void init_terminal() {
