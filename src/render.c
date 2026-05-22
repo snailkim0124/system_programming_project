@@ -97,6 +97,66 @@ Store shop_stock[] = {
 
 #define NUM_KEYS (sizeof(main_keyboard) / sizeof(Key))
 
+int draw_quit() {
+    clear();
+
+    // 키보드는 다시 그리기
+    draw_keyboard(-1);
+
+    int start_y = 23, start_x = 12;
+    int height = 8, width = 40; // 창 크기 고정
+    
+    attron(COLOR_PAIR(2));
+    
+    // 박스 그리기
+    int title_len = strlen(" QUIT ");
+    int side_bar = (width - 2 - title_len) / 2;
+    
+    mvaddch(start_y, start_x, ACS_ULCORNER);
+    for(int i=0; i<side_bar; i++) addch(ACS_HLINE);
+    printw("%s", " QUIT ");
+    for(int i=0; i < (width - 2 - title_len - side_bar); i++) addch(ACS_HLINE);
+    addch(ACS_URCORNER);
+
+    for (int i = 1; i < height - 1; i++) {
+        mvaddch(start_y + i, start_x, ACS_VLINE);
+        for(int j=0; j < width - 2; j++) mvaddch(start_y + i, start_x + 1 + j, ' '); // 배경 지우기
+        mvaddch(start_y + i, start_x + width - 1, ACS_VLINE);
+    }
+
+    mvaddch(start_y + height - 1, start_x, ACS_LLCORNER);
+    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
+    addch(ACS_LRCORNER);
+    
+    attroff(COLOR_PAIR(2));
+
+    // 종료하시겠습니까? 글씨
+    attron(A_BOLD);
+    mvprintw(start_y + 2, start_x + 9, "정말 종료하시겠습니까?");
+    mvprintw(start_y + 4, start_x + 15, "( Y / N )");
+    attroff(A_BOLD);
+    
+    refresh();
+
+    //  진짜 종료할지 판단하는 로직
+    int q_quit = 0;
+    int real_quit = 0;
+
+    while(1) {
+        q_quit = getch();
+        if(q_quit == 'y' || q_quit == 'Y') {
+            real_quit = 1;
+            break;
+        }
+        else if(q_quit == 'n' || q_quit == 'N' || q_quit == 27) {
+            real_quit = 0;
+            break;
+        }
+    }
+
+    return real_quit;
+}
+
 void draw_single_key(Key* key, int highlighted) {
     int y = key->y;
     int x = key->x;
@@ -170,7 +230,7 @@ void draw_inventory(int start_y, int start_x) {
     // 딱 5개만 출력
     for (int i = 0; i < 5; i++) {
         int item_idx = start_idx + i;
-        if (item_idx >= total_items) break; // 혹시 모를 범위 초과 방지
+        if (item_idx >= total_items) break;
 
         // 빈 슬롯 이름 처리
         char item_name[25];
@@ -348,7 +408,9 @@ void init_terminal() {
     cbreak();             
     noecho();             
     keypad(stdscr, TRUE); 
-    curs_set(0);   
+    curs_set(0);
+    set_escdelay(0); // esc 딜레이 없애기
+
     // 색깔 부분
     start_color();
     use_default_colors();

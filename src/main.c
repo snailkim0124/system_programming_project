@@ -13,7 +13,12 @@ int main() {
 
     while (1) {
         ch = getch(); 
-        if (ch == 27) break; 
+        if (ch == 27) {
+            if(draw_quit() == 1) {
+                break;
+            }
+            else clear();
+        } 
 
         if (ch == KEY_F(1)) {
             player.is_inventory_open = !player.is_inventory_open;
@@ -40,7 +45,7 @@ int main() {
                 strcpy(player.ast_msg, ""); // 메시지 초기화
             } 
 
-            if(ch == '\n') {
+            if (ch == '\n') {
                 plant_seed();
             }
 

@@ -8,7 +8,7 @@ void player_init() {
     player.is_inventory_open = false;
     player.is_store_open = false;
     player.inv.money = 1000;
-    strcpy(player.inv.items[0].name, "carrot");
+    strcpy(player.inv.items[0].name, "Carrot");
     player.inv.items[0].count = 5;
     strcpy(player.ast_msg, "");
     player.inv.current_item_count = 1;
@@ -51,5 +51,20 @@ void buy_item(Player *p, int shop_idx) {
 }
 
 void plant_seed() {
+    // 엔터를 누름
     printf("농작물 심기!!\n");
+
+    // 키보드를 선택할 수 있도록 커서를 옮겨야 함
+    int pressed_keycode = getch();
+
+    printf("%d\n", pressed_keycode);
+
+    // for (int i = 0; i < NUM_KEYS; i++) {
+    //     int is_pressed = (main_keyboard[i].keycode == pressed_keycode);
+    //     draw_single_key(&main_keyboard[i], is_pressed);
+    // }
+
+    // 확인하셨습니까?
+
+    // 다시 렌더링
 }
