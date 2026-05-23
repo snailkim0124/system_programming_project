@@ -1,34 +1,74 @@
 #include "render.h"
 #include "player.h"
+#include "save.h"
+#include "crop.h"
 
 int shop_idx = 0;
+ItemType shop_now_tab = TYPE_SEED;
 
 int main() {
+    setlocale(LC_ALL, ""); // 한국어로 설정
     init_terminal();
     player_init();
+    load_game(&player); // 시작할 때 불러오기
+    player.is_store_open = false;
+    player.is_inventory_open = false;
+    strcpy(player.ast_msg, "");
 
     int ch = 0;
+    draw_keyboard(-1);  // 처음에만 렌더링 (깜박거림 방지)
 
-    draw_keyboard(-1); 
+    timeout(1000); // 1초씩 흐르게 하기 => 1초 동안 유저 입력을 기다림
+
+    int count_down = 0;
+    time_t last_time = time(NULL); // 시작 시간 기록
 
     while (1) {
         ch = getch(); 
-        if (ch == 27) {
-            if (draw_quit() == 1) break;
-            else clear();
-        } 
 
-        if (ch == KEY_F(1)) {
-            player.is_inventory_open = !player.is_inventory_open;
-            player.is_store_open = false;
+        time_t current_time = time(NULL);        
+        // 키보드 연타 방지 및 현실 1초가 지난 경우
+        if (current_time - last_time >= 1) {
+            last_time = current_time;
+            count_down++;
+            
+            update_crops();
+
+            if (count_down % 10 == 0) {
+                save_game(&player);
+                if (strlen(player.ast_msg) ==  0) strcpy(player.ast_msg, "자동 저장 완료!");
+                count_down = 0;
+            }
         }
-        else if (ch == KEY_F(2)) {
-            player.is_store_open = !player.is_store_open;
-            player.is_inventory_open = false;
-        }
-        else if (ch == KEY_F(3)) {
-            player.is_store_open = false;
-            player.is_inventory_open = false;
+
+        erase();
+
+        // getch()가 -1을 내는 것을 방지
+        if (ch != ERR) {
+            flushinp(); // 이전 입력 버퍼 지우기 (막 입력하는거 방지)
+
+            if (ch == 27) {
+                if (draw_quit() == 1)  {
+                    save_game(&player);
+                    break; // 종료하기 전 저장
+                }
+            }
+
+            if (ch == KEY_F(1)) {
+                player.is_inventory_open = !player.is_inventory_open;
+                player.is_store_open = false;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            }
+            else if (ch == KEY_F(2)) {
+                player.is_store_open = !player.is_store_open;
+                player.is_inventory_open = false;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            }
+            else if (ch == KEY_F(3)) {
+                player.is_store_open = false;
+                player.is_inventory_open = false;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            }
         }
 
         if(player.is_inventory_open) {
@@ -48,28 +88,63 @@ int main() {
             }
 
             draw_keyboard(-1); 
-            draw_leftwindow(&player, -1);
+            draw_leftwindow(&player, -1, -1);
         }
         else if (player.is_store_open) {
+            // 현재 상점 탭의 아이템 개수 세기
+            int tab_item_count = 0;
+            for (int i = 0; i < SHOP_ITEM_COUNT; i++) {                
+                if (shop_stock[i].item_type == shop_now_tab) { 
+                    tab_item_count++;
+                }
+            }
+
             if (ch == KEY_UP && shop_idx > 0) {
                 shop_idx--;
                 strcpy(player.ast_msg, ""); // 메시지 초기화
             }
-            if (ch == KEY_DOWN && shop_idx < SHOP_ITEM_COUNT - 1) {
+            if (ch == KEY_DOWN && shop_idx < tab_item_count - 1) {
                 shop_idx++;
                 strcpy(player.ast_msg, ""); // 메시지 초기화
             }
 
+            // 상점 탭 이동
+            if (ch == KEY_LEFT && shop_now_tab != TYPE_SEED) {
+                shop_now_tab = TYPE_SEED;
+                shop_idx = 0; 
+                strcpy(player.ast_msg, "");
+            }
+            if (ch == KEY_RIGHT && shop_now_tab != TYPE_EQUIP) {
+                shop_now_tab = TYPE_EQUIP;
+                shop_idx = 0;
+                strcpy(player.ast_msg, "");
+            }
+
             if(ch == '\n') {
-                buy_item(&player, shop_idx);
+                int selected_idx = 0;
+                int count = 0;
+
+                for(int i = 0 ; i< SHOP_ITEM_COUNT; i++) {
+                    if(shop_stock[i].item_type == shop_now_tab) {
+                        if(count == shop_idx) {
+                            selected_idx = i;
+                            break;
+                        }
+                        count++;
+                    }
+                }
+
+                buy_item(&player, selected_idx);
             }
 
             draw_keyboard(-1); 
-            draw_leftwindow(&player, shop_idx);
+            draw_leftwindow(&player, shop_idx, shop_now_tab);
         }
         else {
-            draw_keyboard(ch);
+            draw_keyboard(ch == ERR ? -1 : ch);
         }
+
+        refresh();
     }
 
     close_terminal();

@@ -13,6 +13,8 @@
 #include <ncurses.h>
 #include <locale.h>
 #include <string.h>
+#include <locale.h>
+#include <time.h>
 
 typedef struct {
     int y, x;        
@@ -21,8 +23,11 @@ typedef struct {
     int keycode;
     ////////////
     int is_soil; // 땅인지 아닌지
-    int is_locked; // 땅이 잠겼는지
     int crop_state; // 작물 상태 (, > + > z > Z > 색 변경(녹색, 노란색))
+    int zone_id; // 구역 표현
+
+    int growth_timer; // 성장 타이머
+    char planted_item_name[25]; // 무슨 씨앗?
 } Key;
 
 typedef struct {
@@ -44,6 +49,7 @@ typedef struct {
     bool is_store_open; // 현재 상점?
     bool is_farm_open; // 현재 농장?
     char ast_msg[256]; // 경고 메시지
+    int unlocked_zone; // 현재 어디까지 해금?
 } Player;
 
 extern Player player;

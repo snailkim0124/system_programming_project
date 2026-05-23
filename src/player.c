@@ -7,19 +7,24 @@ Player player;
 void player_init() {
     player.is_inventory_open = false;
     player.is_store_open = false;
-    player.inv.money = 1000;
+    player.inv.money = 100000;
     strcpy(player.inv.items[0].name, "Carrot");
     player.inv.items[0].count = 5;
     strcpy(player.ast_msg, "");
     player.inv.current_item_count = 1;
+    player.unlocked_zone = 0;
 }
 
 void buy_item(Player *p, int shop_idx) {
-    // 상점 아이템 가져오기
-    if(p->inv.money >= shop_stock[shop_idx].price) {
-        p->inv.money -= shop_stock[shop_idx].price;
-        // 아이템 인벤토리에 추가하기
+    if(p->inv.money < shop_stock[shop_idx].buy_price) {
+        sprintf(p->ast_msg, "돈이 부족합니다! (현재 잔액: %d G)  ", player.inv.money);
+        return;
+    }
 
+    // 씨앗인 경우
+    if(shop_stock[shop_idx].item_type == TYPE_SEED) {
+        p->inv.money -= shop_stock[shop_idx].buy_price;
+        // 아이템 인벤토리에 추가하기
         int item_add = 0;
 
         for(int i = 0; i < MAX_ITEMS; i++) {
@@ -43,11 +48,15 @@ void buy_item(Player *p, int shop_idx) {
         }
 
         sprintf(p->ast_msg, "%s 구매 완료! (잔액: %d G)", shop_stock[shop_idx].name, p->inv.money);
+    }
+    else if (shop_stock[shop_idx].item_type == TYPE_EQUIP) {
+        int next_zone = p->unlocked_zone + 1; // 열어야 할 다음 구역 번호
+        p->inv.money -= shop_stock[shop_idx].buy_price;
+        p->unlocked_zone = next_zone;
 
+        sprintf(p->ast_msg, "새로운 구역(Zone %d)이 해금되었습니다!", next_zone);
     }
-    else {
-        sprintf(p->ast_msg, "돈이 부족합니다! (현재 잔액: %d G)  ", player.inv.money);
-    }
+
 }
 
 void plant_seed() {
@@ -56,7 +65,7 @@ void plant_seed() {
 
     for (int i = 0; i < NUM_KEYS; i++) {
         if (main_keyboard[i].is_soil == 1 && 
-            main_keyboard[i].is_locked == 0 && 
+            main_keyboard[i].zone_id <= player.unlocked_zone &&
             main_keyboard[i].crop_state == 0) {
                     
             is_valid_soil = 1;
@@ -71,10 +80,24 @@ void plant_seed() {
     }
 
     // 키보드를 선택할 수 있도록 커서를 옮겨야 함
-    mvprintw(21, 3, "심을 곳을 키보드로 누르세요!");
+    erase(); 
+    draw_keyboard(-1);
+    mvprintw(21, 3, "심을 곳을 키보드로 누르세요! (취소: ESC)");
+    refresh();
+
+    flushinp(); // 이전 입력 버퍼 지우기
+            
     int pressed_keycode = 0;
     while(1) {
         pressed_keycode = getch();
+        if (pressed_keycode == ERR) {
+            continue; 
+        }
+
+        if(pressed_keycode == 27) {
+            return;
+        }
+
         pressed_keycode = tolower(pressed_keycode);
 
         // 심을 수 있는 땅인가?
@@ -83,7 +106,7 @@ void plant_seed() {
         for (int i = 0; i < NUM_KEYS; i++) {
             if (main_keyboard[i].keycode == pressed_keycode) {
                 if (main_keyboard[i].is_soil == 1 && 
-                    main_keyboard[i].is_locked == 0 && 
+                    main_keyboard[i].zone_id <= player.unlocked_zone &&
                     main_keyboard[i].crop_state == 0) {
                     
                     is_valid_soil = 1;
@@ -97,8 +120,9 @@ void plant_seed() {
         }
         else {
             attron(COLOR_PAIR(2));
-            mvprintw(21, 3, "그곳에는 심을 수 없습니다! 다시 누르세요.    ");
+            mvprintw(21, 3, "그곳에는 심을 수 없습니다! 다시 누르세요. (취소: ESC)   ");
             attroff(COLOR_PAIR(2));
+            refresh();
         }
     }
 
@@ -113,18 +137,28 @@ void plant_seed() {
     attron(A_BOLD && COLOR_PAIR(2));
     mvprintw(21, 3, "이 자리에 심으시겠습니까? (같은 곳을 한 번 더 누르세요!)");
     attroff(A_BOLD && COLOR_PAIR(2));
-    
     refresh();
+
+    flushinp(); // 이전 입력 버퍼 지우기
 
     int check = 0;
     while(1) {
         check = getch();
+        if (check == ERR) {
+            continue; 
+        }
+
         // 한번더 똑같은 알파벳을 누른 경우
         if(check == pressed_keycode) {
             // 농작물 심기 (화면에 표시 -> ,)
             for (int i = 0; i < NUM_KEYS; i++) {
                 if (main_keyboard[i].keycode == pressed_keycode) {
                     main_keyboard[i].crop_state = 1;
+
+                    // 식물 이름 저장
+                    main_keyboard[i].growth_timer = 0;
+                    strcpy(main_keyboard[i].planted_item_name, player.inv.items[player.inv.selected_slot].name);
+
                     break;
                 }
             }

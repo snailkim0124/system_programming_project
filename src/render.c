@@ -21,84 +21,105 @@ Key main_keyboard[] = {
     { 5, 42, 5,  "8",     '8' },
     { 5, 47, 5,  "9",     '9' },
     { 5, 52, 5,  "0",     '0' },
-    { 5, 57, 8,  "BSP",   KEY_BACKSPACE },
+    { 5, 57, 5,  "-",     '-' },
+    { 5, 62, 5,  "=",     '=' },
+    { 5, 67, 8,  "BSP",   KEY_BACKSPACE },
 
     // Row 2 (QWE...)
     { 8,  2, 7,  "TAB",   '\t' }, 
-    { 8,  9, 5,  "Q",     'q',  1,  0 },
-    { 8, 14, 5,  "W",     'w',  1,  1 },
-    { 8, 19, 5,  "E",     'e',  1,  1 },
-    { 8, 24, 5,  "R",     'r',  1,  1 },
-    { 8, 29, 5,  "T",     't',  1,  1 },
-    { 8, 34, 5,  "Y",     'y',  1,  1 },
-    { 8, 39, 5,  "U",     'u',  1,  1 },
-    { 8, 44, 5,  "I",     'i',  1,  1 },
-    { 8, 49, 5,  "O",     'o',  1,  1 },
-    { 8, 54, 5,  "P",     'p',  1,  1 },
+    { 8,  9, 5,  "Q",     'q',  1,   0,   ZONE0 },
+    { 8, 14, 5,  "W",     'w',  1,   0,   ZONE0 },
+    { 8, 19, 5,  "E",     'e',  1,   0,   ZONE0 },
+    { 8, 24, 5,  "R",     'r',  1,   0,   ZONE0 },
+    { 8, 29, 5,  "T",     't',  1,   0,   ZONE0 },
+    { 8, 34, 5,  "Y",     'y',  1,   0,   ZONE1 },
+    { 8, 39, 5,  "U",     'u',  1,   0,   ZONE1 },
+    { 8, 44, 5,  "I",     'i',  1,   0,   ZONE1 },
+    { 8, 49, 5,  "O",     'o',  1,   0,   ZONE1 },
+    { 8, 54, 5,  "P",     'p',  1,   0,   ZONE1 },
+    { 8, 59, 5,  "[",     '['},
+    { 8, 64, 5,  "]",     ']'},
+    { 8, 69, 5,  "\\",    '\\'},
 
     // Row 3 (ASD...)
     { 11,  2, 8,  "CAPS",  10 },    
-    { 11, 10, 5,  "A",     'a',  1,  0 },
-    { 11, 15, 5,  "S",     's',  1,  1 },
-    { 11, 20, 5,  "D",     'd',  1,  1 },
-    { 11, 25, 5,  "F",     'f',  1,  1 },
-    { 11, 30, 5,  "G",     'g',  1,  1 },
-    { 11, 35, 5,  "H",     'h',  1,  1 },
-    { 11, 40, 5,  "J",     'j',  1,  1 },
-    { 11, 45, 5,  "K",     'k',  1,  1 },
-    { 11, 50, 5,  "L",     'l',  1,  1 },
-    { 11, 55, 10, "ENTER", '\n' },  
+    { 11, 10, 5,  "A",     'a',  1,   0,   ZONE2 },
+    { 11, 15, 5,  "S",     's',  1,   0,   ZONE2 },
+    { 11, 20, 5,  "D",     'd',  1,   0,   ZONE2 },
+    { 11, 25, 5,  "F",     'f',  1,   0,   ZONE2 },
+    { 11, 30, 5,  "G",     'g',  1,   0,   ZONE2 },
+    { 11, 35, 5,  "H",     'h',  1,   0,   ZONE2 },
+    { 11, 40, 5,  "J",     'j',  1,   0,   ZONE2 },
+    { 11, 45, 5,  "K",     'k',  1,   0,   ZONE2 },
+    { 11, 50, 5,  "L",     'l',  1,   0,   ZONE2 },
+    { 11, 55, 5,  ";",     ';', },
+    { 11, 60, 5,  "\'",     '\'', },
+    { 11, 65, 10, "ENTER", '\n' },  
 
     // Row 4 (ZXC...)
-    { 14,  2, 10, "SHIFT", -1 },   // Left Shift
-    { 14, 12, 5,  "Z",     'z',  1,  0 },
-    { 14, 17, 5,  "X",     'x',  1,  1 },
-    { 14, 22, 5,  "C",     'c',  1,  1 },
-    { 14, 27, 5,  "V",     'v',  1,  1 },
-    { 14, 32, 5,  "B",     'b',  1,  1 },
-    { 14, 37, 5,  "N",     'n',  1,  1 },
-    { 14, 42, 5,  "M",     'm',  1,  1 },
-    { 14, 47, 10, "SHIFT", -1 },   // Right Shift
+    { 14,  2, 10, "SHIFT", -10 },   // Left Shift
+    { 14, 12, 5,  "Z",     'z',  1,   0,   ZONE3 },
+    { 14, 17, 5,  "X",     'x',  1,   0,   ZONE3 },
+    { 14, 22, 5,  "C",     'c',  1,   0,   ZONE3 },
+    { 14, 27, 5,  "V",     'v',  1,   0,   ZONE3 },
+    { 14, 32, 5,  "B",     'b',  1,   0,   ZONE3 },
+    { 14, 37, 5,  "N",     'n',  1,   0,   ZONE3 },
+    { 14, 42, 5,  "M",     'm',  1,   0,   ZONE3 },
+    { 14, 47, 5,   ",",   ',' },
+    { 14, 52, 5,   ".",   '.' },
+    { 14, 57, 5,   "/",   '/' },
+    { 14, 62, 10, "SHIFT", -10 },   // Right Shift
 
     // Row 5 (Spacebar)
-    { 17, 2, 8, "CTRL", 162 },
-    { 17, 10, 5, "WIN", 162 },
-    { 17, 15, 27, "SPACE", ' ' },
+    { 17, 2, 8, "CTRL", -10 },
+    { 17, 10, 5, "WIN", -10 },
+    { 17, 15, 5, "ALT", -10 },
+    { 17, 20, 27, "SPACE", ' ' },
+    { 17, 47, 5, "K/E", -10 },
+    { 17, 52, 5, "HAN", -10 },
+    { 17, 57, 5, "ALT", -10 },
+    { 17, 62, 8, "CTRL", -10 },
 };
 
 Store shop_stock[] = {
-    {"Asparagus", 0, ""},
-    {"Broccoli", 5, ""},
-    {"Carrot", 10, ""},
-    {"Dandelion", 20, ""},
-    {"Eggplant", 30, ""},
-    {"Fern", 40, "물을 주지 않아도 자란다"},
-    {"Garlic", 50, "병충해가 자라지 않는다"},
-    {"Herb", 60, ""},
-    {"Iris", 75, "황금작물로 자랄 경우 5배로 받는다"},
-    {"Jalapeno", 100, "절대 썩지 않는다"},
-    {"Kale", 125, ""},
-    {"Lettuce", 150, ""},
-    {"Mushroom", 200, "시간대 밤일 경우 성장속도가 2배"},
-    {"Nettle", 250, "수확 시 5번 눌러야 한다"},
-    {"Onion", 300, "병충해가 자라지 않는다"},
-    {"Potato", 350, "수확한 자리에 씨앗이 다시 심어진다"},
-    {"Quinoa", 400, ""},
-    {"Radish", 500, ""},
-    {"Spinach", 600, ""},
-    {"Tomato", 700, "성장 완료 후 30분만 지나도 썩는다"},
-    {"Ulluco", 800, "수확한 자리에 씨앗이 다시 심어진다"},
-    {"Vanilla", 900, ""},
-    {"Watercress", 1000, "물없는 상태가 30초 이상이면 썩는다"},
-    {"Xylosma", 1250, "분당 1%로 인접 방향으로 퍼진다"},
-    {"Yam", 1500, ""},
-    {"Zucchini", 2000, ""}
+    // { 이름, 구매가, 판매가, 성장시간, 설명, 타입 }
+    {"Asparagus", 3, 5, 20, "", TYPE_SEED},
+    {"Broccoli", 5, 8, 20, "", TYPE_SEED},
+    {"Carrot", 5, 15, 30, "", TYPE_SEED},
+    {"Dandelion", 10, 20, 30, "", TYPE_SEED},
+    {"Eggplant", 10, 30, 60, "", TYPE_SEED},
+    {"Fern", 10, 20, 120, "물없이 자람", TYPE_SEED},
+    {"Garlic", 20, 40, 120, "병충해 면역", TYPE_SEED},
+    {"Herb", 20, 100, 600, "", TYPE_SEED},
+    {"Iris", 50, 100, 300, "황금작물 확률", TYPE_SEED},
+    {"Jalapeno", 50, 80, 300, "절대 안 썩음", TYPE_SEED},
+    {"Kale", 70, 150, 360, "", TYPE_SEED},
+    {"Lettuce", 100, 200, 600, "", TYPE_SEED},
+    {"Mushroom", 100, 150, 200, "밤에 2배 빠름", TYPE_SEED},
+    {"Nettle", 50, 200, 600, "수확시 5번 클릭", TYPE_SEED},
+    {"Onion", 100, 200, 1200, "병충해 면역", TYPE_SEED},
+    {"Potato", 150, 160, 600, "수확시 씨앗리필", TYPE_SEED},
+    {"Quinoa", 200, 500, 3600, "", TYPE_SEED},
+    {"Radish", 300, 700, 3600, "", TYPE_SEED},
+    {"Spinach", 300, 1000, 7200, "", TYPE_SEED},
+    {"Tomato", 50, 100, 100, "30분뒤 썩음", TYPE_SEED},
+    {"Ulluco", 300, 350, 3600, "수확시 씨앗리필", TYPE_SEED},
+    {"Vanilla", 500, 1000, 4800, "", TYPE_SEED},
+    {"Watercress", 300, 1000, 600, "물없으면 썩음", TYPE_SEED},
+    {"Xylosma", 500, 600, 3600, "인접방향 퍼짐", TYPE_SEED},
+    {"Yam", 1000, 2000, 7200, "", TYPE_SEED},
+    {"Zucchini", 2000, 4000, 36000, "", TYPE_SEED},
+
+    // 장비류
+    {"Land Deed", 1000, 0, 0, "다음 구역 해금", TYPE_EQUIP},
+    {"Pesticide", 500, 0, 0, "병충해 0%", TYPE_EQUIP},
+    {"Sprinkler", 10000, 0, 0, "자동 물주기", TYPE_EQUIP}
 };
 
 #define NUM_KEYS (sizeof(main_keyboard) / sizeof(Key))
 
 int draw_quit() {
-    clear();
+    erase(); // 화면 초기화
 
     // 키보드는 다시 그리기
     draw_keyboard(-1);
@@ -180,15 +201,21 @@ void draw_single_key(Key* key, int highlighted) {
     int label_len = strlen(key->label);
     int padding = (w - 2 - label_len) / 2;
     for(int i=0; i<padding; i++) addch(' ');
-    if(key->is_locked) {
+    if(key->zone_id > player.unlocked_zone) {
         printw("#");
     }
-    else if(isalpha(key->keycode)) {
+    else if(key->is_soil) {
         if (key->crop_state == 1) {
             printw(","); // 씨앗이 심어진 상태
         } 
         else if (key->crop_state == 2) {
-            printw("+"); // (나중을 위해 미리 만들어두는 새싹 상태)
+            printw("+"); // 새싹
+        }
+        else if (key->crop_state == 3) {
+            printw("z"); // 자라는 중
+        }
+        else if (key->crop_state == 4) {
+            printw("Z"); // 수확 가능!
         }
         else {
             printw(" "); // 상태가 0(빈 땅)일 때는 원래대로 빈칸
@@ -213,7 +240,6 @@ void draw_single_key(Key* key, int highlighted) {
 }
 
 void draw_keyboard(int pressed_keycode) {
-    erase(); 
     mvprintw(0, 2, "농장게임 (종료: ESC)");
     
     for (int i = 0; i < NUM_KEYS; i++) {
@@ -222,8 +248,6 @@ void draw_keyboard(int pressed_keycode) {
     }
 
     mvprintw(20, 2, "F1 : 인벤토리\tF2 : 상점\tF3 : 농장\t현재 잔액 : %d G", player.inv.money);
-
-    refresh();
 }
 
 void draw_inventory(int start_y, int start_x) {
@@ -267,12 +291,22 @@ void draw_inventory(int start_y, int start_x) {
     }
 
     mvprintw(start_y + WIN_HEIGHT - 5, start_x, "현재 잔액: %d G", player.inv.money);
-    mvprintw(start_y + WIN_HEIGHT - 4, start_x, "(닫기: F1 / 이동: 화살표)");
+    mvprintw(start_y + WIN_HEIGHT - 4, start_x, "(닫기: F1 / 이동: ↑ ↓)");
 }
 
-void draw_store(int start_y, int start_x, int selected_idx) {
+void draw_store(int start_y, int start_x, int selected_idx, ItemType shop_now_tab) {
+    int tab_items[100]; 
+    int tab_item_count = 0;
+
+    for (int i = 0; i < SHOP_ITEM_COUNT; i++) {
+        if (shop_stock[i].item_type == shop_now_tab) {
+            tab_items[tab_item_count] = i; // 진짜 번호(i)를 지도에 기록!
+            tab_item_count++;
+        }
+    }
+
     // 판매 목록 출력
-    int total_items = SHOP_ITEM_COUNT;
+    int total_items = tab_item_count;
 
     // 스크롤 시작 위치 계산
     int start_idx = selected_idx - 2;
@@ -291,6 +325,8 @@ void draw_store(int start_y, int start_x, int selected_idx) {
         int item_idx = start_idx + i;
         if (item_idx >= total_items) break;
 
+        int real_idx = tab_items[item_idx];
+
         // 선택된 아이템 강조
         if (item_idx == selected_idx) {
             attron(A_REVERSE | A_BOLD);
@@ -298,20 +334,20 @@ void draw_store(int start_y, int start_x, int selected_idx) {
         
         // 아이템 출력
         mvprintw(start_y + i, start_x + 4, "[%02d] %-15s | %3d G", 
-                 item_idx + 1, shop_stock[item_idx].name, shop_stock[item_idx].price);
+                 item_idx + 1, shop_stock[real_idx].name, shop_stock[real_idx].buy_price);
         
         if (item_idx == selected_idx) {
             attroff(A_REVERSE | A_BOLD);
             // 선택된 아이템의 설명도 하단에 띄우기
-            mvprintw(start_y + WIN_HEIGHT - 6, start_x + 4, "설명: %s", shop_stock[item_idx].explan);
+            mvprintw(start_y + WIN_HEIGHT - 6, start_x + 4, "설명: %s", shop_stock[real_idx].explan);
         }
     }
 
     mvprintw(start_y + WIN_HEIGHT - 5, start_x, "현재 잔액: %d G", player.inv.money);
-    mvprintw(start_y + WIN_HEIGHT - 4, start_x, "(닫기: F2 / 이동: 화살표)");
+    mvprintw(start_y + WIN_HEIGHT - 4, start_x, "(닫기: F2 / 이동: ↑ ↓ / 상점탭: ← →)");
 }
 
-void draw_leftwindow(Player *player, int selected_idx) {
+void draw_leftwindow(Player *player, int selected_idx, ItemType shop_now_tab) {
     if (player->is_inventory_open && player->is_store_open) return;
 
     int start_y = 23, start_x = 3;
@@ -324,7 +360,12 @@ void draw_leftwindow(Player *player, int selected_idx) {
         strcpy(subtitle, " INVENTORY ");
         color = 1; // 금색
     } else if (player->is_store_open) {
-        strcpy(subtitle, " SEED STORE ");
+        if(shop_now_tab == TYPE_SEED) {
+            strcpy(subtitle, " SEED STORE ");
+        }
+        else if(shop_now_tab == TYPE_EQUIP) {
+            strcpy(subtitle, " EQUIP STORE ");
+        }
         color = 1; // 상점용 다른 색
     }
 
@@ -359,7 +400,7 @@ void draw_leftwindow(Player *player, int selected_idx) {
     if (player->is_inventory_open) {
         draw_inventory(start_y + 2, start_x + 2);
     } else if (player->is_store_open) {
-        draw_store(start_y + 2, start_x + 2, selected_idx);
+        draw_store(start_y + 2, start_x + 2, selected_idx, shop_now_tab);
     }
 
     //  경고 메시지가 있는 경우
@@ -373,8 +414,6 @@ void draw_leftwindow(Player *player, int selected_idx) {
         else {
             mvprintw(21, 3, "알림: %s", player->ast_msg); 
         }
-
-        refresh();
     }
 
     draw_rightwindow(player);
