@@ -25,6 +25,7 @@ typedef struct {
     int is_soil; // 땅인지 아닌지
     int crop_state; // 작물 상태 (, > + > z > Z > 색 변경(녹색, 노란색))
     int zone_id; // 구역 표현
+    int is_harm; // 병충해?
 
     int growth_timer; // 성장 타이머
     char planted_item_name[25]; // 무슨 씨앗?

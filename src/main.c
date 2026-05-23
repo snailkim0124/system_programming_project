@@ -1,19 +1,13 @@
 #include "render.h"
 #include "player.h"
-#include "save.h"
 #include "crop.h"
 
 int shop_idx = 0;
 ItemType shop_now_tab = TYPE_SEED;
 
 int main() {
-    setlocale(LC_ALL, ""); // 한국어로 설정
     init_terminal();
     player_init();
-    load_game(&player); // 시작할 때 불러오기
-    player.is_store_open = false;
-    player.is_inventory_open = false;
-    strcpy(player.ast_msg, "");
 
     int ch = 0;
     draw_keyboard(-1);  // 처음에만 렌더링 (깜박거림 방지)
@@ -34,6 +28,7 @@ int main() {
             
             update_crops();
 
+            // 10초마다
             if (count_down % 10 == 0) {
                 save_game(&player);
                 if (strlen(player.ast_msg) ==  0) strcpy(player.ast_msg, "자동 저장 완료!");
@@ -141,6 +136,10 @@ int main() {
             draw_leftwindow(&player, shop_idx, shop_now_tab);
         }
         else {
+            if(ch != ERR) {
+                remove_pest(&player, ch); // 병충해 없애기
+                sell_item(&player, ch); // 팔기
+            }
             draw_keyboard(ch == ERR ? -1 : ch);
         }
 

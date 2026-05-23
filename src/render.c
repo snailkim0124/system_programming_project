@@ -201,29 +201,55 @@ void draw_single_key(Key* key, int highlighted) {
     int label_len = strlen(key->label);
     int padding = (w - 2 - label_len) / 2;
     for(int i=0; i<padding; i++) addch(' ');
+
     if(key->zone_id > player.unlocked_zone) {
         printw("#");
     }
     else if(key->is_soil) {
-        if (key->crop_state == 1) {
-            printw(","); // 씨앗이 심어진 상태
+        attroff(COLOR_PAIR(1));
+
+        // 흰색
+        int now_color = 0; 
+
+        if (key->is_harm) {
+            now_color = 2; // 빨간색
         } 
-        else if (key->crop_state == 2) {
-            printw("+"); // 새싹
+        else if (key->crop_state == 7) {
+            now_color = 4; // 황금 작물 (노란색)
+        } 
+        else if (key->crop_state == 5) {
+            now_color = 3; // 다 자란 작물 (초록색)
         }
-        else if (key->crop_state == 3) {
-            printw("z"); // 자라는 중
+        
+        attron(COLOR_PAIR(now_color));
+
+        switch (key->crop_state) {
+            case 1: 
+                printw(","); 
+                break;
+            case 2: 
+                printw("+"); 
+                break;
+            case 3: 
+                printw("%c", tolower(key->planted_item_name[0])); 
+                break;
+            case 4:
+            case 5:
+            case 7: 
+                printw("%c", toupper(key->planted_item_name[0])); 
+                break;
+            default: 
+                printw(" "); // 0(빈 땅)이거나 그 외
+                break;
         }
-        else if (key->crop_state == 4) {
-            printw("Z"); // 수확 가능!
-        }
-        else {
-            printw(" "); // 상태가 0(빈 땅)일 때는 원래대로 빈칸
-        }
+
+        attroff(COLOR_PAIR(now_color));
+        attron(COLOR_PAIR(1));
     }
     else {
         printw("%s", key->label);
     }
+    
     for(int i=0; i< (w - 2 - label_len - padding); i++) addch(' ');
 
     mvaddch(y + 1, x + w - 1, ACS_VLINE);
@@ -248,6 +274,24 @@ void draw_keyboard(int pressed_keycode) {
     }
 
     mvprintw(20, 2, "F1 : 인벤토리\tF2 : 상점\tF3 : 농장\t현재 잔액 : %d G", player.inv.money);
+
+    //  경고 메시지가 있는 경우
+    if (strlen(player.ast_msg) > 0) {
+        // space 2번인 경우 빨간색 출력
+        if(strstr(player.ast_msg, "  ") != NULL) {
+            attron(COLOR_PAIR(2));
+            mvprintw(21, 3, "알림: %s", player.ast_msg); 
+            attroff(COLOR_PAIR(2));
+        }
+        else if (strstr(player.ast_msg, "럭키") != NULL) {
+            attron(COLOR_PAIR(4));
+            mvprintw(21, 3, "알림: %s", player.ast_msg); 
+            attroff(COLOR_PAIR(4));
+        }
+        else {
+            mvprintw(21, 3, "알림: %s", player.ast_msg); 
+        }
+    }
 }
 
 void draw_inventory(int start_y, int start_x) {
@@ -403,19 +447,6 @@ void draw_leftwindow(Player *player, int selected_idx, ItemType shop_now_tab) {
         draw_store(start_y + 2, start_x + 2, selected_idx, shop_now_tab);
     }
 
-    //  경고 메시지가 있는 경우
-    if (strlen(player->ast_msg) > 0) {
-        // space 2번인 경우 빨간색 출력
-        if(strstr(player->ast_msg, "  ") != NULL) {
-            attron(COLOR_PAIR(2));
-            mvprintw(21, 3, "알림: %s", player->ast_msg); 
-            attroff(COLOR_PAIR(2));
-        }
-        else {
-            mvprintw(21, 3, "알림: %s", player->ast_msg); 
-        }
-    }
-
     draw_rightwindow(player);
 }
 
@@ -462,7 +493,7 @@ void draw_rightwindow(Player *player) {
 }
 
 void init_terminal() {
-    setlocale(LC_ALL, ""); 
+    setlocale(LC_ALL, ""); // 한글 설정
     initscr();
     cbreak();             
     noecho();             
@@ -475,6 +506,8 @@ void init_terminal() {
     use_default_colors();
     init_pair(1, 94, -1); // 94번은 갈색 계열, -1은 투명 배경
     init_pair(2, COLOR_RED, COLOR_BLACK);
+    init_pair(3, COLOR_GREEN, COLOR_BLACK);
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK); // 황금 작물용
 }
 
 void close_terminal() {

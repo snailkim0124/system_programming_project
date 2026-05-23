@@ -1,18 +1,28 @@
 #include "common.h"
 #include "player.h"
 #include "render.h"
+#include "save.h"
 
 Player player;
 
 void player_init() {
+    // 실제
+    // player.unlocked_zone = 0;
+    // player.inv.money = 15;
+
+    // 디버그용
     player.is_inventory_open = false;
     player.is_store_open = false;
-    player.inv.money = 100000;
     strcpy(player.inv.items[0].name, "Carrot");
     player.inv.items[0].count = 5;
+    player.inv.money = 100000;
     strcpy(player.ast_msg, "");
     player.inv.current_item_count = 1;
-    player.unlocked_zone = 0;
+
+    load_game(&player); // 시작할 때 불러오기
+    player.is_store_open = false;
+    player.is_inventory_open = false;
+    strcpy(player.ast_msg, "");
 }
 
 void buy_item(Player *p, int shop_idx) {
@@ -188,4 +198,62 @@ void plant_seed() {
             break;
         }
     }
+}
+
+void remove_pest(Player *p, int pressed_keycode) {
+    // 병충해인 경우
+    int i = 0;
+    for (i = 0; i < NUM_KEYS; i++) {
+        if (main_keyboard[i].keycode == pressed_keycode) {
+            break;
+        }
+    }
+    if (i == NUM_KEYS) return;
+
+   if (main_keyboard[i].is_soil && main_keyboard[i].is_harm) {
+        main_keyboard[i].is_harm++;
+
+        // 다섯 번 눌러야 사라짐
+        if(main_keyboard[i].is_harm >= 5) {
+            main_keyboard[i].is_harm = 0;
+        }
+   } 
+
+}
+
+void sell_item(Player *p, int pressed_keycode) {
+    // 다 자랐으면 팔기
+    int i = 0;
+    for (i = 0; i < NUM_KEYS; i++) {
+        if (main_keyboard[i].keycode == pressed_keycode) {
+            break;
+        }
+    }
+
+    if (i == NUM_KEYS) return;
+
+    if(main_keyboard[i].crop_state < 5 || main_keyboard[i].is_harm) {
+        return;
+    } 
+
+    // 수익 증가
+    int selling_money = 0;
+    for(int j = 0; j < SHOP_ITEM_COUNT; j++) {
+        if(strcmp(shop_stock[j].name, main_keyboard[i].planted_item_name) == 0) {
+            selling_money = shop_stock[j].sell_price * (main_keyboard[i].crop_state == 7 ? 2 : 1); // 황금 작물이면 2배
+            break;
+        }
+    }
+    p->inv.money += selling_money;
+
+    // 알림 추가
+    if (main_keyboard[i].crop_state == 7) {
+        sprintf(p->ast_msg, "럭키! 판매 완료! (+ %d G)", selling_money);
+    }
+    else sprintf(p->ast_msg, "판매 완료! (+ %d G)", selling_money);
+
+    // 빈 땅으로 바꾸기
+    main_keyboard[i].crop_state = 0;
+    main_keyboard[i].growth_timer = 0;
+    strcpy(main_keyboard[i].planted_item_name, "");
 }
