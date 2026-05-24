@@ -5,7 +5,7 @@
 
 #define WIN_HEIGHT 12
 #define WIN_WIDTH 40
-#define SHOP_ITEM_COUNT 40
+#define SHOP_ITEM_COUNT 32
 #define NUM_KEYS 67
 
 typedef enum {

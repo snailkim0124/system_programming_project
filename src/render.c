@@ -125,7 +125,7 @@ Store shop_stock[] = {
     {"Pesticide", 500, 0, 0, "병충해 0%", TYPE_EQUIP, ZONE1}, // 농약
     {"Sprinkler", 2000, 0, 0, "자동 물주기", TYPE_EQUIP, ZONE1}, // 스프링쿨러
     {"Scarecrow", 2000, 0, 0, "병충해 영구 제거", TYPE_EQUIP, ZONE2}, // 허수아비
-    {"Placard", 100000, 0, 0, "텃밭 꾸미기", TYPE_EQUIP, ZONE3}, // 플래카드(엔딩)
+    {"Placard", 100000, 0, 0, "텃밭 꾸미기", TYPE_EQUIP, ZONE3} // 플래카드(엔딩)
 };
 
 #define NUM_KEYS (sizeof(main_keyboard) / sizeof(Key))
@@ -197,8 +197,12 @@ void draw_single_key(Key* key, int highlighted) {
 
     if (highlighted) attron(A_REVERSE);
 
+    // 병충해인 경우 강조
+    if (key->is_harm > 0) {
+        attron(COLOR_PAIR(7) | A_BOLD | A_BLINK); 
+    }
     // 땅인 경우 갈색으로
-    if(key->is_soil) {
+    else if(key->is_soil) {
         attron(COLOR_PAIR(1));
     }
     
@@ -218,15 +222,10 @@ void draw_single_key(Key* key, int highlighted) {
         printw("#");
     }
     else if(key->is_soil) {
-        attroff(COLOR_PAIR(1));
-
         // 흰색
         int now_color = 0; 
 
-        if (key->is_harm) {
-            now_color = 2; // 빨간색
-        } 
-        else if (key->crop_state == 98) {
+        if (key->crop_state == 98) {
             now_color = 5; // 주황색
         }
         else if(key->crop_state == 99) {
@@ -239,7 +238,13 @@ void draw_single_key(Key* key, int highlighted) {
             now_color = 3; // 다 자란 작물 (초록색)
         }
         
-        attron(COLOR_PAIR(now_color));
+
+        if (key->is_harm == 0) {
+            attroff(COLOR_PAIR(1));
+            if (now_color != 0) {
+                attron(COLOR_PAIR(now_color));
+            }
+        }
 
         switch (key->crop_state) {
             case 1: 
@@ -267,8 +272,12 @@ void draw_single_key(Key* key, int highlighted) {
                 break;
         }
 
-        attroff(COLOR_PAIR(now_color));
-        attron(COLOR_PAIR(1));
+        if (key->is_harm == 0) {
+            if (now_color != 0) {
+                attroff(COLOR_PAIR(now_color));
+            }
+            attron(COLOR_PAIR(1));
+        }
     }
     else {
         printw("%s", key->label);
@@ -283,9 +292,13 @@ void draw_single_key(Key* key, int highlighted) {
     for (int i = 0; i < w - 2; i++) addch(ACS_HLINE);
     addch(ACS_LRCORNER);
 
-    if(key->is_soil) {
+    if (key->is_harm > 0) {
+        attroff(COLOR_PAIR(7) | A_BOLD | A_BLINK);
+    }
+    else if(key->is_soil) {
         attroff(COLOR_PAIR(1));
     }
+    
     if (highlighted) attroff(A_REVERSE);
 }
 
@@ -448,10 +461,11 @@ void draw_store(int start_y, int start_x, int selected_idx, ItemType shop_now_ta
                  item_idx + 1, shop_stock[real_idx].name, shop_stock[real_idx].buy_price);
         }
         else {
-            mvprintw(start_y + i, start_x + 4, "[%02d] %-15s | %s ", 
-                 item_idx + 1, "???", "???");
+           attron(COLOR_PAIR(2));
+            mvprintw(start_y + i, start_x + 4, "[%02d] 텃밭 %d단계 해금", 
+                 item_idx + 1, shop_stock[real_idx].zone);
+            attroff(COLOR_PAIR(2));
         }
-
         
         if (item_idx == selected_idx) {
             attroff(A_REVERSE | A_BOLD);
@@ -665,6 +679,7 @@ void init_terminal() {
     init_pair(4, COLOR_YELLOW, COLOR_BLACK); // 황금 작물용
     init_pair(5, 208, COLOR_BLACK); // 주황색 - 허수아비
     init_pair(6, COLOR_BLUE, COLOR_BLACK); // 파란색 - 스프링쿨러
+    init_pair(7, COLOR_WHITE, COLOR_RED); // 흰색 - 빨간색 > 병충해
 }
 
 void close_terminal() {
