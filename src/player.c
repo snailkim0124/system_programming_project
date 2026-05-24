@@ -11,17 +11,16 @@ void player_init() {
     // player.inv.money = 15;
 
     // 디버그용
+    player.is_remove_open = false;
     player.is_inventory_open = false;
     player.is_store_open = false;
-    strcpy(player.inv.items[0].name, "Carrot");
-    player.inv.items[0].count = 5;
     player.inv.money = 100000;
     strcpy(player.ast_msg, "");
-    player.inv.current_item_count = 1;
 
     load_game(&player); // 시작할 때 불러오기
     player.is_store_open = false;
     player.is_inventory_open = false;
+    player.is_remove_open = false;
     strcpy(player.ast_msg, "");
 }
 
@@ -246,6 +245,99 @@ void use_item() {
             }
 
             consume_selected_item();
+            break;
+        }
+        else {
+            break;
+        }
+    }
+}
+
+void remove_item() {
+    erase(); 
+    draw_keyboard(-1);
+    mvprintw(21, 3, "철거할 곳을 키보드로 누르세요! (취소: ESC)");    
+    refresh();
+
+    flushinp(); // 이전 입력 버퍼 지우기
+
+    int pressed_keycode = 0;
+    while(1) {
+        pressed_keycode = getch();
+        if (pressed_keycode == ERR) {
+            continue; 
+        }
+        if(pressed_keycode == 27 || pressed_keycode == KEY_F(4)) {
+            mvprintw(21, 3, "                                                                           ");
+            refresh();
+            return;
+        }
+
+        if (pressed_keycode == KEY_F(1) || pressed_keycode == KEY_F(2) || pressed_keycode == KEY_F(3)) {
+            mvprintw(21, 3, "                                                                           ");
+            refresh();
+            
+            // 방금 삼킨 키를 다시 입력 버퍼에 넣음
+            ungetch(pressed_keycode); 
+            return; 
+        }
+
+        pressed_keycode = tolower(pressed_keycode);
+
+        int is_valid_soil = 0;
+        for (int i = 0; i < NUM_KEYS; i++) {
+            if (main_keyboard[i].keycode == pressed_keycode) {
+                if (main_keyboard[i].is_soil == 1 && main_keyboard[i].crop_state > 0) {
+                    is_valid_soil = 1;
+                }
+                break;
+            }
+        }
+
+        if (is_valid_soil == 1) {
+            break; 
+        } else {
+            attron(COLOR_PAIR(2));
+            mvprintw(21, 3, "그곳에는 철거할 것이 없습니다! 다시 누르세요. (취소: ESC)   ");
+            attroff(COLOR_PAIR(2));
+            refresh();
+        }
+    }
+
+    // 선택한 키보드 표시
+    for (int i = 0; i < NUM_KEYS; i++) {
+        int is_pressed = (main_keyboard[i].keycode == pressed_keycode);
+        draw_single_key(&main_keyboard[i], is_pressed);
+    }
+
+    mvprintw(21, 3, "                                                                           ");
+    attron(A_BOLD | COLOR_PAIR(2));
+    mvprintw(21, 3, "정말 철거하시겠습니까? (같은 곳을 한 번 더 누르세요!)");
+    attroff(A_BOLD | COLOR_PAIR(2));
+    refresh();
+
+    flushinp();
+
+    int check = 0;
+    while(1) {
+        check = getch();
+        if (check == ERR) {
+            continue; 
+        }
+
+        if(check == pressed_keycode) {
+            
+            for (int i = 0; i < NUM_KEYS; i++) {
+                if (main_keyboard[i].keycode == pressed_keycode) {
+                    main_keyboard[i].crop_state = 0;
+                    main_keyboard[i].growth_timer = 0;
+                    main_keyboard[i].is_harm = 0;
+                    strcpy(main_keyboard[i].planted_item_name, ""); 
+                    
+                    sprintf(player.ast_msg, "철거를 완료했습니다!");
+                    break;
+                }
+            }
             break;
         }
         else {

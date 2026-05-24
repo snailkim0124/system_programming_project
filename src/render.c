@@ -297,7 +297,7 @@ void draw_keyboard(int pressed_keycode) {
         draw_single_key(&main_keyboard[i], is_pressed);
     }
 
-    mvprintw(20, 2, "F1 : 인벤토리\tF2 : 상점\tF3 : 농장\t현재 잔액 : %d G", player.inv.money);
+    mvprintw(20, 2, "F1: 인벤토리 / F2: 상점 / F3: 농장 / F4: 제거\t\t현재 잔액: %d G", player.inv.money);
 
     //  경고 메시지가 있는 경우
     if (strlen(player.ast_msg) > 0) {

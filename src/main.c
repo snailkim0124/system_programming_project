@@ -66,14 +66,23 @@ int main() {
             if (ch == KEY_F(1)) {
                 player.is_inventory_open = !player.is_inventory_open;
                 player.is_store_open = false;
+                player.is_remove_open = false;
                 strcpy(player.ast_msg, ""); // 메시지 초기화
             }
             else if (ch == KEY_F(2)) {
                 player.is_store_open = !player.is_store_open;
                 player.is_inventory_open = false;
+                player.is_remove_open = false;
                 strcpy(player.ast_msg, ""); // 메시지 초기화
             }
             else if (ch == KEY_F(3)) {
+                player.is_store_open = false;
+                player.is_inventory_open = false;
+                player.is_remove_open = false;
+                strcpy(player.ast_msg, ""); // 메시지 초기화
+            }
+            else if (ch == KEY_F(4)) {
+                player.is_remove_open = !player.is_remove_open;
                 player.is_store_open = false;
                 player.is_inventory_open = false;
                 strcpy(player.ast_msg, ""); // 메시지 초기화
@@ -148,6 +157,9 @@ int main() {
 
             draw_keyboard(-1); 
             draw_leftwindow(&player, shop_idx, shop_now_tab);
+        }
+        else if (player.is_remove_open) {
+            remove_item();
         }
         else {
             if(ch != ERR) {

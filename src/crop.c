@@ -16,6 +16,22 @@ void update_crops() {
             main_keyboard[i].crop_state > 0 && 
             main_keyboard[i].crop_state < 5) {
 
+            if (main_keyboard[i].is_harm > 0) {
+                main_keyboard[i].harm_timer++; // 1초마다 방치 시간 1씩 증가!
+                
+                // 15초 동안 병충해 방치하면 사라짐
+                if (main_keyboard[i].harm_timer >= 15) {
+                    main_keyboard[i].crop_state = 0;
+                    main_keyboard[i].growth_timer = 0;
+                    main_keyboard[i].is_harm = 0;
+                    main_keyboard[i].harm_timer = 0;
+                    strcpy(main_keyboard[i].planted_item_name, ""); 
+                    
+                    sprintf(player.ast_msg, "벌레를 방치해서 작물이 죽어버렸습니다!  ");
+                    continue; // 죽었으니 아래의 성장 로직 스킵
+                }
+            }
+
             int near_sprinkler = 0;
             int near_scarecrow = 0;
 

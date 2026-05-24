@@ -30,6 +30,7 @@ typedef struct {
 
     int growth_timer; // 성장 타이머
     char planted_item_name[25]; // 무슨 씨앗?
+    int harm_timer; // 병충해 시간 타이머
 } Key;
 
 typedef struct {
@@ -50,6 +51,8 @@ typedef struct {
     bool is_inventory_open; // 현재 인벤토리가 열려 있는지 확인
     bool is_store_open; // 현재 상점?
     bool is_farm_open; // 현재 농장?
+    bool is_remove_open; // 현재 제거?
+
     char ast_msg[256]; // 경고 메시지
     int unlocked_zone; // 현재 어디까지 해금?
 
