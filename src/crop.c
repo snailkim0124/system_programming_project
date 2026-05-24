@@ -15,10 +15,38 @@ void update_crops() {
         if (main_keyboard[i].is_soil == 1 && 
             main_keyboard[i].crop_state > 0 && 
             main_keyboard[i].crop_state < 5) {
-            
-            if(main_keyboard[i].crop_state >= 1 && main_keyboard[i].crop_state <= 4) pest_event(i);
 
-            main_keyboard[i].growth_timer++; 
+            int near_sprinkler = 0;
+            int near_scarecrow = 0;
+
+            for (int j = 0; j < NUM_KEYS; j++) {
+                // 장비 설치 됐다면?
+                if (main_keyboard[j].crop_state >= 98) {
+                    
+                    // 두 밭 거리 차이
+                    int dx = abs(main_keyboard[i].x - main_keyboard[j].x);
+                    int dy = abs(main_keyboard[i].y - main_keyboard[j].y);
+
+                    // 인접한 지?
+                    if ((dy == 0 && dx == 5) || (dy == 3 && dx <= 6)) {
+                        if (main_keyboard[j].crop_state == 99) {
+                            near_sprinkler = 1;
+                        }
+                        else if (main_keyboard[j].crop_state == 98) {
+                            near_scarecrow = 1;
+                        }
+                    }
+                }
+            }
+            
+            // 농약 효과, 허수아비 효과
+            if (player.buff_pesticide_time <= 0 && !near_scarecrow) pest_event(i);
+
+            // 비료 효과, 스프링쿨러 효과
+            if (player.buff_fertilizer_time > 0 || near_sprinkler) {
+                main_keyboard[i].growth_timer += 2; // 2배 빨라짐
+            }
+            else main_keyboard[i].growth_timer++; 
 
             int total_time = get_crop_growth_time(main_keyboard[i].planted_item_name);
 

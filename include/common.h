@@ -15,6 +15,7 @@
 #include <string.h>
 #include <locale.h>
 #include <time.h>
+#include <math.h>
 
 typedef struct {
     int y, x;        
@@ -23,7 +24,7 @@ typedef struct {
     int keycode;
     ////////////
     int is_soil; // 땅인지 아닌지
-    int crop_state; // 작물 상태 (, > + > z > Z > 색 변경(녹색, 노란색))
+    int crop_state; // 0 : 빈 땅, 1~5 성장, 7 : 황금 작물, 98 : 허수아비, 99 : 스프링쿨러
     int zone_id; // 구역 표현
     int is_harm; // 병충해?
 
@@ -51,6 +52,9 @@ typedef struct {
     bool is_farm_open; // 현재 농장?
     char ast_msg[256]; // 경고 메시지
     int unlocked_zone; // 현재 어디까지 해금?
+
+    int buff_fertilizer_time; // 비료 버프 남은 시간
+    int buff_pesticide_time;  // 농약 버프 남은 시간
 } Player;
 
 extern Player player;

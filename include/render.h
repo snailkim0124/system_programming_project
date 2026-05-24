@@ -25,6 +25,7 @@ typedef struct {
     int growth_time;
     char explan[25];
     ItemType item_type; // 씨앗, 장비
+    ZoneType zone;
 } Store;
 
 extern Store shop_stock[];

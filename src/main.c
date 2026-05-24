@@ -25,6 +25,20 @@ int main() {
         if (current_time - last_time >= 1) {
             last_time = current_time;
             count_down++;
+
+            // 도구 효과
+            if (player.buff_fertilizer_time > 0) {
+                player.buff_fertilizer_time--;
+                if (player.buff_fertilizer_time == 0) {
+                    strcpy(player.ast_msg, "비료 효과가 끝났습니다!");
+                }
+            }
+            if (player.buff_pesticide_time > 0) {
+                player.buff_pesticide_time--;
+                if (player.buff_pesticide_time == 0) {
+                    strcpy(player.ast_msg, "농약 효과가 끝났습니다!");
+                }
+            }
             
             update_crops();
 
@@ -79,7 +93,7 @@ int main() {
             } 
 
             if (ch == '\n') {
-                plant_seed();
+                use_item();
             }
 
             draw_keyboard(-1); 
@@ -119,7 +133,7 @@ int main() {
                 int selected_idx = 0;
                 int count = 0;
 
-                for(int i = 0 ; i< SHOP_ITEM_COUNT; i++) {
+                for(int i = 0 ; i < SHOP_ITEM_COUNT; i++) {
                     if(shop_stock[i].item_type == shop_now_tab) {
                         if(count == shop_idx) {
                             selected_idx = i;
