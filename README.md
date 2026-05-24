@@ -38,13 +38,16 @@
   make
 
 * **게임 실행:**
-```bash
-./farm_game
+ ```bash
+ ./farm_game
+ ```
 
 * **빌드 파일 삭제 (목적 파일 및 실행 파일 제거):**
-```bash
-make clean
+ ```bash
+ make clean
+ ```
 
 * **세이브 데이터 초기화 (save.dat 파일 삭제):**
-```bash
-make reset
+ ```bash
+ make reset
+ ```
