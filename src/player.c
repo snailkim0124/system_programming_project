@@ -399,6 +399,7 @@ void remove_pest(Player *p, int pressed_keycode) {
         // 다섯 번 눌러야 사라짐
         if(main_keyboard[i].is_harm > 5) {
             main_keyboard[i].is_harm = 0;
+            main_keyboard[i].harm_timer = 0;
         }
    } 
 }
