@@ -24,19 +24,22 @@ typedef struct {
     int sell_price; 
     int growth_time;
     char explan[25];
-    ItemType item_type; // 씨앗, 장비
+    ItemType item_type;
     ZoneType zone;
 } Store;
 
 extern Store shop_stock[];
 extern Key main_keyboard[];
 
-// 키보드 전체를 그리는 함수
+void draw_placard(Player *p);
+int draw_quit();
+void draw_single_key(Key* key, int highlighted);
 void draw_keyboard(int pressed_keycode);
+void draw_inventory(int start_y, int start_x);
+void draw_store(int start_y, int start_x, int selected_idx, ItemType shop_now_tab);
+void draw_main_window(Player *player, int selected_idx, ItemType shop_now_tab);
 void draw_leftwindow(Player *player, int selected_idx, ItemType shop_now_tab);
-
-// ncurses 초기화 및 종료 함수
-void init_terminal();
-void close_terminal();
+void get_korean_name(const char *eng_name, char *kor_name);
+void draw_info(Player *player, Store *item);
 
 #endif

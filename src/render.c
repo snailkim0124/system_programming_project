@@ -656,7 +656,7 @@ void draw_info(Player *player, Store *item) {
 
     // 정보 적기
 
-    // 아이템 이름 한국어로 (강조)
+    // 한국어로
     char kor_name[50];
     get_korean_name(item->name, kor_name);
 
@@ -678,15 +678,14 @@ void draw_info(Player *player, Store *item) {
     }
     mvprintw(start_y + 5, start_x + 2, "Price: %d G", display_price);
 
-    // 4. 판매가(Sell) 출력
-    if (strcmp(item->name, "Land Deed") == 0) {
+    // 판매가
+    if (item->item_type == TYPE_EQUIP) {
         mvprintw(start_y + 6, start_x + 2, "Sell: -"); 
     } else {
         mvprintw(start_y + 6, start_x + 2, "Sell: %d G", item->sell_price);
     }
 
-    // 성장 시간(Time) 출력
-    // 씨앗일 때만 시간을 보여주고, 도구나 확장권은 '-'로 표시합니다.
+    // 성장 시간 출력
     if (item->item_type == TYPE_SEED) {
         mvprintw(start_y + 7, start_x + 2, "Time: %d Sec", item->growth_time); 
     } else {
@@ -696,30 +695,4 @@ void draw_info(Player *player, Store *item) {
     // 아이템 설명
     mvprintw(start_y + 9, start_x + 2, "[ Info ]");
     mvprintw(start_y + 10, start_x + 2, "%s", item->explan);
-}
-
-void init_terminal() {
-    setlocale(LC_ALL, ""); // 한글 설정
-    initscr();
-    cbreak();             
-    noecho();             
-    keypad(stdscr, TRUE); 
-    curs_set(0);
-    set_escdelay(0); // esc 딜레이 없애기
-
-    // 색깔 부분
-    start_color();
-    use_default_colors();
-    init_pair(1, 94, -1); // 94번은 갈색 계열, -1은 투명 배경
-    init_pair(2, COLOR_RED, COLOR_BLACK);
-    init_pair(3, COLOR_GREEN, COLOR_BLACK);
-    init_pair(4, COLOR_YELLOW, COLOR_BLACK); // 황금 작물용
-    init_pair(5, 208, COLOR_BLACK); // 주황색 - 허수아비
-    init_pair(6, COLOR_BLUE, COLOR_BLACK); // 파란색 - 스프링쿨러
-    init_pair(7, COLOR_WHITE, COLOR_RED); // 흰색 - 빨간색 > 병충해
-    init_pair(8, COLOR_BLACK, COLOR_YELLOW); // 썩음
-}
-
-void close_terminal() {
-    endwin(); 
 }

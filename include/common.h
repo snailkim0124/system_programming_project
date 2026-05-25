@@ -1,5 +1,6 @@
 #ifndef COMMON_H
 #define COMMON_H
+
 #define MAX_ITEMS 20
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -10,12 +11,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <termio.h>
-#include <ncurses.h>
-#include <locale.h>
-#include <string.h>
-#include <locale.h>
 #include <time.h>
 #include <math.h>
+#include <ncurses.h>
+#include <locale.h>
 
 typedef struct {
     int y, x;        
@@ -48,10 +47,10 @@ typedef struct {
 typedef struct {
     int cur_y, cur_x;
     Inventory inv;
-    bool is_inventory_open; // 현재 인벤토리가 열려 있는지 확인
-    bool is_store_open; // 현재 상점?
-    bool is_farm_open; // 현재 농장?
-    bool is_remove_open; // 현재 제거?
+    int is_inventory_open; // 현재 인벤토리가 열려 있는지 확인
+    int is_store_open; // 현재 상점?
+    int is_farm_open; // 현재 농장?
+    int is_remove_open; // 현재 제거?
 
     char ast_msg[256]; // 경고 메시지
     int unlocked_zone; // 현재 어디까지 해금?

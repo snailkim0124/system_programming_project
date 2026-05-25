@@ -1,6 +1,8 @@
 #include "render.h"
 #include "player.h"
 #include "crop.h"
+#include "save.h"
+#include "system.h"
 
 int shop_idx = 0;
 ItemType shop_now_tab = TYPE_SEED;
@@ -8,22 +10,20 @@ ItemType shop_now_tab = TYPE_SEED;
 int main() {
     init_terminal();
     player_init();
+
     int ch = 0;
     draw_keyboard(-1);  // 처음에만 렌더링 (깜박거림 방지)
     draw_placard(&player);
     
-    timeout(1000); // 1초씩 흐르게 하기 => 1초 동안 유저 입력을 기다림
+    timeout(100); // 0.1초 단위로 game_tick 확인
 
     int count_down = 0;
-    time_t last_time = time(NULL); // 시작 시간 기록
 
     while (1) {
         ch = getch(); 
-
-        time_t current_time = time(NULL);        
-        // 키보드 연타 방지 및 현실 1초가 지난 경우
-        if (current_time - last_time >= 1) {
-            last_time = current_time;
+  
+        if(game_tick) {
+            game_tick = 0;
             count_down++;
 
             // 도구 효과
