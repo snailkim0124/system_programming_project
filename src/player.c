@@ -14,7 +14,7 @@ void player_init() {
     player.is_remove_open = false;
     player.is_inventory_open = false;
     player.is_store_open = false;
-    player.inv.money = 100000;
+    player.inv.money = 200000;
     strcpy(player.ast_msg, "");
 
     load_game(&player); // 시작할 때 불러오기
@@ -50,6 +50,10 @@ void buy_item(Player *p, int shop_idx) {
         p->unlocked_zone = next_zone;
 
         sprintf(p->ast_msg, "새로운 구역(Zone %d)이 해금되었습니다!", next_zone);
+    }
+    // 플래카드 해방
+    else if(strcmp(shop_stock[shop_idx].name, "Placard") == 0) {
+        p->is_placard = 1;
     }
     else {
         p->inv.money -= real_buy_price;
@@ -159,21 +163,24 @@ void use_item() {
 
     flushinp(); // 이전 입력 버퍼 지우기
             
-    int pressed_keycode = 0;
+    int target_keycode = -1; // 내가 설치할 키보드
+
     while(1) {
-        pressed_keycode = getch();
+        int pressed_keycode = getch();
         if (pressed_keycode == ERR) {
             continue; 
         }
 
-        if(pressed_keycode == 27) {
+        if(pressed_keycode == 27) { // ESC 취소
+            sprintf(player.ast_msg, "설치를 취소했습니다.");
             return;
         }
 
         pressed_keycode = tolower(pressed_keycode);
 
-        // 심을 수 있는 땅인가?
+        // 심을 수 있는 땅인가 검사
         int is_valid_soil = 0;
+        int soil_idx = -1; // 찾은 밭의 인덱스
 
         for (int i = 0; i < NUM_KEYS; i++) {
             if (main_keyboard[i].keycode == pressed_keycode) {
@@ -182,72 +189,55 @@ void use_item() {
                     main_keyboard[i].crop_state == 0) {
                     
                     is_valid_soil = 1;
+                    soil_idx = i;
                 }
                 break;
             }
         }
 
-        if (is_valid_soil == 1) {
-            break; 
-        }
-        else {
+        // 유효하지 않은 땅을 누른 경우
+        if (is_valid_soil == 0) {
             attron(COLOR_PAIR(2));
+            mvprintw(21, 3, "                                                               "); // 기존 줄 지우기
             if (item_type == TYPE_SEED) mvprintw(21, 3, "그곳에는 심을 수 없습니다! 다시 누르세요. (취소: ESC)   ");
             else mvprintw(21, 3, "그곳에는 설치할 수 없습니다! 다시 누르세요. (취소: ESC)   ");
             attroff(COLOR_PAIR(2));
             refresh();
-        }
-    }
-
-    // 키보드 표시
-    for (int i = 0; i < NUM_KEYS; i++) {
-        int is_pressed = (main_keyboard[i].keycode == pressed_keycode);
-        draw_single_key(&main_keyboard[i], is_pressed);
-    }
-
-    // 확인하셨습니까?
-    mvprintw(21, 3, "                                                                                                   ");
-    attron(A_BOLD | COLOR_PAIR(2));
-    // strcpy(player.ast_msg, " "); // 알람 자동 저장 안 뜨게 방지 
-    mvprintw(21, 3, "이 자리가 맞으십니까? (같은 곳을 한 번 더 누르세요!)");
-    attroff(A_BOLD | COLOR_PAIR(2));
-    refresh();
-
-    flushinp(); // 이전 입력 버퍼 지우기
-
-    int check = 0;
-    while(1) {
-        check = getch();
-        if (check == ERR) {
-            continue; 
+            continue;
         }
 
-        // 한번더 똑같은 알파벳을 누른 경우
-        if(check == pressed_keycode) {
-            // 농작물 심기 (화면에 표시 -> ,)
+        // 처음 눌렀거나, 다른 밭을 누른 경우
+        if (target_keycode == -1 || target_keycode != pressed_keycode) {
+            target_keycode = pressed_keycode; // 타겟 바꾸기
+
+            // 키보드 하이라이트 표시 갱신
             for (int i = 0; i < NUM_KEYS; i++) {
-                if (main_keyboard[i].keycode == pressed_keycode) {
-                    if (item_type == TYPE_SEED) {
-                        main_keyboard[i].crop_state = 1;
-                        main_keyboard[i].growth_timer = 0;
-                        strcpy(main_keyboard[i].planted_item_name, item_name);
-                        sprintf(player.ast_msg, "%s을 심었습니다!", item_name);
-                    } 
-                    else if (strcmp(item_name, "Sprinkler") == 0 || strcmp(item_name, "Scarecrow") == 0) {
-                        if(strcmp(item_name, "Sprinkler") == 0) main_keyboard[i].crop_state = 99;
-                        else main_keyboard[i].crop_state = 98;
-
-                        strcpy(main_keyboard[i].planted_item_name, item_name);
-                        sprintf(player.ast_msg, "%s를 설치했습니다!", item_name);
-                    }
-                    break;
-                }
+                int is_pressed = (main_keyboard[i].keycode == target_keycode);
+                draw_single_key(&main_keyboard[i], is_pressed);
             }
 
+            mvprintw(21, 3, "                                                               ");
+            attron(A_BOLD | COLOR_PAIR(2));
+            mvprintw(21, 3, "이 자리가 맞으십니까? (같은 곳을 한 번 더 누르세요!)");
+            attroff(A_BOLD | COLOR_PAIR(2));
+            refresh();
+        } 
+        else if (target_keycode == pressed_keycode) {
+            if (item_type == TYPE_SEED) {
+                main_keyboard[soil_idx].crop_state = 1;
+                main_keyboard[soil_idx].growth_timer = 0;
+                strcpy(main_keyboard[soil_idx].planted_item_name, item_name);
+                sprintf(player.ast_msg, "%s을(를) 심었습니다!", item_name);
+            } 
+            else if (strcmp(item_name, "Sprinkler") == 0 || strcmp(item_name, "Scarecrow") == 0) {
+                if(strcmp(item_name, "Sprinkler") == 0) main_keyboard[soil_idx].crop_state = 99;
+                else main_keyboard[soil_idx].crop_state = 98;
+
+                strcpy(main_keyboard[soil_idx].planted_item_name, item_name);
+                sprintf(player.ast_msg, "%s을(를) 설치했습니다!", item_name);
+            }
             consume_selected_item();
-            break;
-        }
-        else {
+
             break;
         }
     }
@@ -359,18 +349,24 @@ void sell_item(Player *p, int pressed_keycode) {
 
     if(main_keyboard[i].crop_state < 5 || main_keyboard[i].crop_state >= 98 || main_keyboard[i].is_harm ) {
         return;
-    } 
+    }
 
-    // 수익 증가
     int selling_money = 0;
-    for(int j = 0; j < SHOP_ITEM_COUNT; j++) {
-        if(strcmp(shop_stock[j].name, main_keyboard[i].planted_item_name) == 0) {
-            selling_money = shop_stock[j].sell_price * (main_keyboard[i].crop_state == 7 ? 2 : 1); // 황금 작물이면 2배
-            break;
+    // 썩은 작물은 1원
+    if(main_keyboard[i].crop_state == 6) {
+        selling_money = 1;
+    }
+    else {
+        for(int j = 0; j < SHOP_ITEM_COUNT; j++) {
+            if(strcmp(shop_stock[j].name, main_keyboard[i].planted_item_name) == 0) {
+                selling_money = shop_stock[j].sell_price * (main_keyboard[i].crop_state == 7 ? 2 : 1); // 황금 작물이면 2배
+                break;
+            }
         }
     }
-    p->inv.money += selling_money;
 
+    // 수익 증가
+    p->inv.money += selling_money;
     // 알림 추가
     if (main_keyboard[i].crop_state == 7) {
         sprintf(p->ast_msg, "럭키! 판매 완료! (+ %d G)", selling_money);

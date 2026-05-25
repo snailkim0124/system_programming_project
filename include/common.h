@@ -58,6 +58,7 @@ typedef struct {
 
     int buff_fertilizer_time; // 비료 버프 남은 시간
     int buff_pesticide_time;  // 농약 버프 남은 시간
+    int is_placard; // 플래카드 가능?
 } Player;
 
 extern Player player;

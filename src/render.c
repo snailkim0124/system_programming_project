@@ -121,14 +121,45 @@ Store shop_stock[] = {
 
     // 장비류 
     {"Land Deed", 100, 0, 0, "다음 구역 해금", TYPE_EQUIP, ZONE0}, // 땅 확장
-    {"Fertilizer", 1000, 0, 0, "작물 성장속도 증가", TYPE_EQUIP, ZONE0}, // 비료
-    {"Pesticide", 500, 0, 0, "병충해 0%", TYPE_EQUIP, ZONE1}, // 농약
+    {"Fertilizer", 1000, 0, 0, "작물 성장속도 UP", TYPE_EQUIP, ZONE0}, // 비료
+    {"Pesticide", 500, 0, 0, "전체 병충해 0%", TYPE_EQUIP, ZONE1}, // 농약
     {"Sprinkler", 2000, 0, 0, "자동 물주기", TYPE_EQUIP, ZONE1}, // 스프링쿨러
     {"Scarecrow", 2000, 0, 0, "병충해 영구 제거", TYPE_EQUIP, ZONE2}, // 허수아비
     {"Placard", 100000, 0, 0, "텃밭 꾸미기", TYPE_EQUIP, ZONE3} // 플래카드(엔딩)
 };
 
 #define NUM_KEYS (sizeof(main_keyboard) / sizeof(Key))
+
+void draw_placard(Player *p) {
+    if(!p->is_placard) return; 
+
+    int start_y = 2;
+    int start_x = 2;
+    int width = 73; // 플래카드 가로 길이 (키보드 너비에 맞게 조절)
+
+    // 1. 플래카드 테두리 그리기 (원하는 색상 적용 가능)
+    attron(COLOR_PAIR(4) | A_BOLD);
+    mvaddch(start_y, start_x, ACS_ULCORNER);
+    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
+    addch(ACS_URCORNER);
+
+    mvaddch(start_y + 1, start_x, ACS_VLINE);
+    // 빈 공간 채우기
+    for (int i = 0; i < width - 2; i++) addch(' '); 
+    mvaddch(start_y + 1, start_x + width - 1, ACS_VLINE);
+
+    mvaddch(start_y + 2, start_x, ACS_LLCORNER);
+    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
+    addch(ACS_LRCORNER);
+    attroff(COLOR_PAIR(4) | A_BOLD);
+
+    // 내용 채우기
+    attron(A_BOLD);
+    mvprintw(start_y + 1, start_x + 2, "[ 누구의 농장 ]");
+    mvprintw(start_y + 1, start_x + 20, "알림: %s", p->ast_msg);
+    mvprintw(start_y + 1, start_x + width - 15, "잔액: %d 원", p->inv.money);
+    attroff(A_BOLD);
+}
 
 int draw_quit() {
     erase(); // 화면 초기화
@@ -237,6 +268,9 @@ void draw_single_key(Key* key, int highlighted) {
         else if (key->crop_state == 5) {
             now_color = 3; // 다 자란 작물 (초록색)
         }
+        else if (key->crop_state == 6) {
+            now_color = 8; 
+        }
         
 
         if (key->is_harm == 0) {
@@ -258,6 +292,7 @@ void draw_single_key(Key* key, int highlighted) {
                 break;
             case 4:
             case 5:
+            case 6:
             case 7: 
                 printw("%c", toupper(key->planted_item_name[0])); 
                 break;
@@ -314,6 +349,8 @@ void draw_keyboard(int pressed_keycode) {
 
     //  경고 메시지가 있는 경우
     if (strlen(player.ast_msg) > 0) {
+        // 알림 창 비우기
+        mvprintw(21, 3, "                                                                  ");
         // space 2번인 경우 빨간색 출력
         if(strstr(player.ast_msg, "  ") != NULL) {
             attron(COLOR_PAIR(2));
@@ -375,7 +412,7 @@ void draw_inventory(int start_y, int start_x) {
                 }
                 
                 if (found_shop_idx != -1) {
-                    draw_rightwindow(&player, &shop_stock[found_shop_idx]);
+                    draw_info(&player, &shop_stock[found_shop_idx]);
                 }
             } 
             else {
@@ -472,7 +509,7 @@ void draw_store(int start_y, int start_x, int selected_idx, ItemType shop_now_ta
             // 선택된 아이템의 설명도 하단에 띄우기
             if(shop_stock[real_idx].zone <= player.unlocked_zone) {
                 mvprintw(start_y + WIN_HEIGHT - 6, start_x + 4, "설명: %s", shop_stock[real_idx].explan);
-                draw_rightwindow(&player, &shop_stock[real_idx]);
+                draw_info(&player, &shop_stock[real_idx]);
             }
         }
     }
@@ -481,7 +518,7 @@ void draw_store(int start_y, int start_x, int selected_idx, ItemType shop_now_ta
     mvprintw(start_y + WIN_HEIGHT - 4, start_x, "(닫기: F2 / 이동: ↑ ↓ / 상점탭: ← →)");
 }
 
-void draw_leftwindow(Player *player, int selected_idx, ItemType shop_now_tab) {
+void draw_main_window(Player *player, int selected_idx, ItemType shop_now_tab) {
     if (player->is_inventory_open && player->is_store_open) return;
 
     int start_y = 23, start_x = 3;
@@ -579,11 +616,11 @@ void get_korean_name(const char *eng_name, char *kor_name) {
     else strcpy(kor_name, eng_name); 
 }
 
-void draw_rightwindow(Player *player, Store *item) {
+void draw_info(Player *player, Store *item) {
     if (player->is_inventory_open && player->is_store_open) return;
 
     int start_y = 23, start_x = 45;
-    int height = 12, width = 20; // 창 크기 고정
+    int height = 12, width = 30; // 창 크기 고정
     char subtitle[20];
 
     // 1. 제목 및 색상 결정
@@ -658,7 +695,7 @@ void draw_rightwindow(Player *player, Store *item) {
 
     // 아이템 설명
     mvprintw(start_y + 9, start_x + 2, "[ Info ]");
-    mvprintw(start_y + 10, start_x + 2, "%.16s", item->explan);
+    mvprintw(start_y + 10, start_x + 2, "%s", item->explan);
 }
 
 void init_terminal() {
@@ -680,6 +717,7 @@ void init_terminal() {
     init_pair(5, 208, COLOR_BLACK); // 주황색 - 허수아비
     init_pair(6, COLOR_BLUE, COLOR_BLACK); // 파란색 - 스프링쿨러
     init_pair(7, COLOR_WHITE, COLOR_RED); // 흰색 - 빨간색 > 병충해
+    init_pair(8, COLOR_BLACK, COLOR_YELLOW); // 썩음
 }
 
 void close_terminal() {

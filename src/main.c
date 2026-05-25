@@ -8,10 +8,10 @@ ItemType shop_now_tab = TYPE_SEED;
 int main() {
     init_terminal();
     player_init();
-
     int ch = 0;
     draw_keyboard(-1);  // 처음에만 렌더링 (깜박거림 방지)
-
+    draw_placard(&player);
+    
     timeout(1000); // 1초씩 흐르게 하기 => 1초 동안 유저 입력을 기다림
 
     int count_down = 0;
@@ -106,7 +106,7 @@ int main() {
             }
 
             draw_keyboard(-1); 
-            draw_leftwindow(&player, -1, -1);
+            draw_main_window(&player, -1, -1);
         }
         else if (player.is_store_open) {
             // 현재 상점 탭의 아이템 개수 세기
@@ -156,7 +156,7 @@ int main() {
             }
 
             draw_keyboard(-1); 
-            draw_leftwindow(&player, shop_idx, shop_now_tab);
+            draw_main_window(&player, shop_idx, shop_now_tab);
         }
         else if (player.is_remove_open) {
             remove_item();
@@ -169,6 +169,7 @@ int main() {
             draw_keyboard(ch == ERR ? -1 : ch);
         }
 
+        draw_placard(&player);
         refresh();
     }
 

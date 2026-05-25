@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/time.h>
 
 void save_game(Player *p);
 void load_game(Player *p);
