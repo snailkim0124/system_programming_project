@@ -1,157 +1,47 @@
 #include "render.h"
 
-Key main_keyboard[] = {
-    // Row 0 (Function Keys)
-    { 2,  2, 8,  "ESC",   27 },
-    { 2, 13, 5,  "F1",    KEY_F(1) },
-    { 2, 18, 5,  "F2",    KEY_F(2) },
-    { 2, 23, 5,  "F3",    KEY_F(3) },
-    { 2, 28, 5,  "F4",    KEY_F(4) },
+void draw_box(int start_y, int start_x, int height, int width, int color_pair, const char *title) {
+    if (color_pair != 0) attron(COLOR_PAIR(color_pair));
 
-    { 2, 34, 5,  "F5",    KEY_F(5) },
-    { 2, 39, 5,  "F6",    KEY_F(6) },
-    { 2, 44, 5,  "F7",    KEY_F(7) },
-    { 2, 49, 5,  "F8",    KEY_F(8) },
+    // 1. 상단 테두리 (제목이 있으면 중간에 삽입)
+    mvaddch(start_y, start_x, ACS_ULCORNER);
+    if (title != NULL && strlen(title) > 0) {
+        int title_len = strlen(title);
+        int side_bar = (width - 2 - title_len) / 2;
+        for (int i = 0; i < side_bar; i++) addch(ACS_HLINE);
+        printw("%s", title);
+        for (int i = 0; i < (width - 2 - title_len - side_bar); i++) addch(ACS_HLINE);
+    } else {
+        for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
+    }
+    addch(ACS_URCORNER);
 
-    { 2, 55, 5,  "F9",    KEY_F(9) },
-    { 2, 60, 5,  "F10",    KEY_F(10) },
-    { 2, 65, 5,  "F11",    KEY_F(11) },
-    { 2, 70, 5,  "F12",    KEY_F(12) },
-    
-    // Row 1 (Numbers) - 총 너비 55 (2~57)
-    { 5,  2, 5,  "`",     '`' },
-    { 5,  7, 5,  "1",     '1' },
-    { 5, 12, 5,  "2",     '2' },
-    { 5, 17, 5,  "3",     '3' },
-    { 5, 22, 5,  "4",     '4' },
-    { 5, 27, 5,  "5",     '5' },
-    { 5, 32, 5,  "6",     '6' },
-    { 5, 37, 5,  "7",     '7' },
-    { 5, 42, 5,  "8",     '8' },
-    { 5, 47, 5,  "9",     '9' },
-    { 5, 52, 5,  "0",     '0' },
-    { 5, 57, 5,  "-",     '-' },
-    { 5, 62, 5,  "=",     '=' },
-    { 5, 67, 8,  "BSP",   KEY_BACKSPACE },
+    // 2. 몸통 (좌우 테두리 + 빈 공간 지우기)
+    for (int i = 1; i < height - 1; i++) {
+        mvaddch(start_y + i, start_x, ACS_VLINE);
+        for (int j = 0; j < width - 2; j++) {
+            addch(' '); // 배경을 공백으로 덮어씌움
+        }
+        mvaddch(start_y + i, start_x + width - 1, ACS_VLINE);
+    }
 
-    // Row 2 (QWE...)
-    { 8,  2, 8,  "TAB",   '\t' }, 
-    { 8, 10, 5,  "Q",     'q',  1,   0,   ZONE0 },
-    { 8, 15, 5,  "W",     'w',  1,   0,   ZONE0 },
-    { 8, 20, 5,  "E",     'e',  1,   0,   ZONE0 },
-    { 8, 25, 5,  "R",     'r',  1,   0,   ZONE0 },
-    { 8, 30, 5,  "T",     't',  1,   0,   ZONE0 },
-    { 8, 35, 5,  "Y",     'y',  1,   0,   ZONE1 },
-    { 8, 40, 5,  "U",     'u',  1,   0,   ZONE1 },
-    { 8, 45, 5,  "I",     'i',  1,   0,   ZONE1 },
-    { 8, 50, 5,  "O",     'o',  1,   0,   ZONE1 },
-    { 8, 55, 5,  "P",     'p',  1,   0,   ZONE1 },
-    { 8, 60, 5,  "[",     '['},
-    { 8, 65, 5,  "]",     ']'},
-    { 8, 70, 5,  "\\",    '\\'},
+    // 3. 하단 테두리
+    mvaddch(start_y + height - 1, start_x, ACS_LLCORNER);
+    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
+    addch(ACS_LRCORNER);
 
-    // Row 3 (ASD...)
-    { 11,  2, 9,  "CAPS",  -10 },    
-    { 11, 11, 5,  "A",     'a',  1,   0,   ZONE2 },
-    { 11, 16, 5,  "S",     's',  1,   0,   ZONE2 },
-    { 11, 21, 5,  "D",     'd',  1,   0,   ZONE2 },
-    { 11, 26, 5,  "F",     'f',  1,   0,   ZONE2 },
-    { 11, 31, 5,  "G",     'g',  1,   0,   ZONE2 },
-    { 11, 36, 5,  "H",     'h',  1,   0,   ZONE2 },
-    { 11, 41, 5,  "J",     'j',  1,   0,   ZONE2 },
-    { 11, 46, 5,  "K",     'k',  1,   0,   ZONE2 },
-    { 11, 51, 5,  "L",     'l',  1,   0,   ZONE2 },
-    { 11, 56, 5,  ";",     ';', },
-    { 11, 61, 5,  "\'",     '\'', },
-    { 11, 66, 9, "ENTER", '\n' },  
-
-    // Row 4 (ZXC...)
-    { 14,  2, 12, "SHIFT", -10 },   // Left Shift
-    { 14, 14, 5,  "Z",     'z',  1,   0,   ZONE3 },
-    { 14, 19, 5,  "X",     'x',  1,   0,   ZONE3 },
-    { 14, 24, 5,  "C",     'c',  1,   0,   ZONE3 },
-    { 14, 29, 5,  "V",     'v',  1,   0,   ZONE3 },
-    { 14, 34, 5,  "B",     'b',  1,   0,   ZONE3 },
-    { 14, 39, 5,  "N",     'n',  1,   0,   ZONE3 },
-    { 14, 44, 5,  "M",     'm',  1,   0,   ZONE3 },
-    { 14, 49, 5,   ",",   ',' },
-    { 14, 54, 5,   ".",   '.' },
-    { 14, 59, 5,   "/",   '/' },
-    { 14, 64, 11, "SHIFT", -10 },   // Right Shift
-
-    // Row 5 (Spacebar)
-    { 17, 2, 9, "CTRL", -10 },
-    { 17, 11, 5, "WIN", -10 },
-    { 17, 16, 5, "ALT", -10 },
-    { 17, 21, 27, "SPACE", ' ' },
-    { 17, 48, 8, "KO/ENG", -10 },
-    { 17, 56, 5, "HAN", -10 },
-    { 17, 61, 5, "ALT", -10 },
-    { 17, 66, 9, "CTRL", -10 },
-};
-
-Store shop_stock[] = {
-    // { 이름, 구매가, 판매가, 성장시간, 설명, 타입 }
-    {"Asparagus", 3, 5, 20, "", TYPE_SEED, ZONE0},
-    {"Broccoli", 5, 8, 20, "", TYPE_SEED, ZONE0},
-    {"Carrot", 5, 15, 30, "", TYPE_SEED, ZONE0},
-    {"Dandelion", 10, 20, 30, "", TYPE_SEED, ZONE0},
-    {"Eggplant", 10, 30, 60, "", TYPE_SEED, ZONE0},
-    {"Fern", 10, 20, 120, "물없이 자람", TYPE_SEED, ZONE1},
-    {"Garlic", 20, 40, 120, "병충해 면역", TYPE_SEED, ZONE1},
-    {"Herb", 20, 100, 600, "", TYPE_SEED, ZONE1},
-    {"Iris", 50, 100, 300, "황금작물 확률", TYPE_SEED, ZONE1},
-    {"Jalapeno", 50, 80, 300, "절대 안 썩음", TYPE_SEED, ZONE1},
-    {"Kale", 70, 150, 360, "", TYPE_SEED, ZONE2},
-    {"Lettuce", 100, 200, 600, "", TYPE_SEED, ZONE2},
-    {"Mushroom", 100, 150, 200, "밤에 2배 빠름", TYPE_SEED, ZONE2},
-    {"Nettle", 50, 200, 600, "수확시 5번 클릭", TYPE_SEED, ZONE2},
-    {"Onion", 100, 200, 1200, "병충해 면역", TYPE_SEED, ZONE2},
-    {"Potato", 150, 160, 600, "수확시 씨앗리필", TYPE_SEED, ZONE2},
-    {"Quinoa", 200, 500, 3600, "", TYPE_SEED, ZONE2},
-    {"Radish", 300, 700, 3600, "", TYPE_SEED, ZONE2},
-    {"Spinach", 300, 1000, 7200, "", TYPE_SEED, ZONE2},
-    {"Tomato", 50, 100, 100, "30분뒤 썩음", TYPE_SEED, ZONE2},
-    {"Ulluco", 300, 350, 3600, "수확시 씨앗리필", TYPE_SEED, ZONE3},
-    {"Vanilla", 500, 1000, 4800, "", TYPE_SEED, ZONE3},
-    {"Watercress", 300, 1000, 600, "물없으면 썩음", TYPE_SEED, ZONE3},
-    {"Xylosma", 500, 600, 3600, "인접방향 퍼짐", TYPE_SEED, ZONE3},
-    {"Yam", 1000, 2000, 7200, "", TYPE_SEED, ZONE3},
-    {"Zucchini", 2000, 4000, 36000, "", TYPE_SEED, ZONE3},
-
-    // 장비류 
-    {"Land Deed", 100, 0, 0, "다음 구역 해금", TYPE_EQUIP, ZONE0}, // 땅 확장
-    {"Fertilizer", 1000, 0, 0, "작물 성장속도 UP", TYPE_EQUIP, ZONE0}, // 비료
-    {"Pesticide", 500, 0, 0, "전체 병충해 0%", TYPE_EQUIP, ZONE1}, // 농약
-    {"Sprinkler", 2000, 0, 0, "자동 물주기", TYPE_EQUIP, ZONE1}, // 스프링쿨러
-    {"Scarecrow", 2000, 0, 0, "병충해 영구 제거", TYPE_EQUIP, ZONE2}, // 허수아비
-    {"Placard", 100000, 0, 0, "텃밭 꾸미기", TYPE_EQUIP, ZONE3} // 플래카드(엔딩)
-};
-
-#define NUM_KEYS (sizeof(main_keyboard) / sizeof(Key))
+    if (color_pair != 0) attroff(COLOR_PAIR(color_pair));
+}
 
 void draw_placard(Player *p) {
     if(!p->is_placard) return; 
 
     int start_y = 2;
     int start_x = 2;
-    int width = 73; // 플래카드 가로 길이 (키보드 너비에 맞게 조절)
+    int height = 3;
+    int width = 73; 
 
-    // 1. 플래카드 테두리 그리기 (원하는 색상 적용 가능)
-    attron(COLOR_PAIR(4) | A_BOLD);
-    mvaddch(start_y, start_x, ACS_ULCORNER);
-    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
-    addch(ACS_URCORNER);
-
-    mvaddch(start_y + 1, start_x, ACS_VLINE);
-    // 빈 공간 채우기
-    for (int i = 0; i < width - 2; i++) addch(' '); 
-    mvaddch(start_y + 1, start_x + width - 1, ACS_VLINE);
-
-    mvaddch(start_y + 2, start_x, ACS_LLCORNER);
-    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
-    addch(ACS_LRCORNER);
-    attroff(COLOR_PAIR(4) | A_BOLD);
+    draw_box(start_y, start_x, height, width, 4, "");
 
     // 내용 채우기
     attron(A_BOLD);
@@ -173,26 +63,7 @@ int draw_quit() {
     attron(COLOR_PAIR(2));
     
     // 박스 그리기
-    int title_len = strlen(" QUIT ");
-    int side_bar = (width - 2 - title_len) / 2;
-    
-    mvaddch(start_y, start_x, ACS_ULCORNER);
-    for(int i=0; i<side_bar; i++) addch(ACS_HLINE);
-    printw("%s", " QUIT ");
-    for(int i=0; i < (width - 2 - title_len - side_bar); i++) addch(ACS_HLINE);
-    addch(ACS_URCORNER);
-
-    for (int i = 1; i < height - 1; i++) {
-        mvaddch(start_y + i, start_x, ACS_VLINE);
-        for(int j=0; j < width - 2; j++) mvaddch(start_y + i, start_x + 1 + j, ' '); // 배경 지우기
-        mvaddch(start_y + i, start_x + width - 1, ACS_VLINE);
-    }
-
-    mvaddch(start_y + height - 1, start_x, ACS_LLCORNER);
-    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
-    addch(ACS_LRCORNER);
-    
-    attroff(COLOR_PAIR(2));
+    draw_box(start_y, start_x, height, width, 2, " QUIT ");
 
     // 종료하시겠습니까? 글씨
     attron(A_BOLD);
@@ -525,7 +396,7 @@ void draw_main_window(Player *player, int selected_idx, ItemType shop_now_tab) {
     int height = 12, width = 40; // 창 크기 고정
     char subtitle[20];
 
-    // 1. 제목 및 색상 결정
+    // 제목 및 색상 결정
     int color = 1;
     if (player->is_inventory_open) {
         strcpy(subtitle, " INVENTORY ");
@@ -540,34 +411,10 @@ void draw_main_window(Player *player, int selected_idx, ItemType shop_now_tab) {
         color = 1; // 상점용 다른 색
     }
 
-    // 2. 외곽 박스 그리기
-    attron(COLOR_PAIR(color));
-    
-    // 상단 (제목 포함)
-    int title_len = strlen(subtitle);
-    int side_bar = (width - 2 - title_len) / 2;
-    
-    mvaddch(start_y, start_x, ACS_ULCORNER);
-    for(int i=0; i<side_bar; i++) addch(ACS_HLINE);
-    printw("%s", subtitle);
-    for(int i=0; i < (width - 2 - title_len - side_bar); i++) addch(ACS_HLINE);
-    addch(ACS_URCORNER);
+    // 박스 그리기
+    draw_box(start_y, start_x, height, width, color, subtitle);
 
-    // 몸통
-    for (int i = 1; i < height - 1; i++) {
-        mvaddch(start_y + i, start_x, ACS_VLINE);
-        for(int j=0; j < width - 2; j++) mvaddch(start_y + i, start_x + 1 + j, ' '); // 배경 지우기
-        mvaddch(start_y + i, start_x + width - 1, ACS_VLINE);
-    }
-
-    // 하단
-    mvaddch(start_y + height - 1, start_x, ACS_LLCORNER);
-    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
-    addch(ACS_LRCORNER);
-    
-    attroff(COLOR_PAIR(color));
-
-    // 3. 내용물 그리기
+    // 내용물 그리기
     if (player->is_inventory_open) {
         draw_inventory(start_y + 2, start_x + 2);
     } else if (player->is_store_open) {
@@ -575,93 +422,18 @@ void draw_main_window(Player *player, int selected_idx, ItemType shop_now_tab) {
     }
 }
 
-void get_korean_name(const char *eng_name, char *kor_name) {
-    // 씨앗류 (A ~ Z)
-    if (strcmp(eng_name, "Asparagus") == 0) strcpy(kor_name, "아스파라거스");
-    else if (strcmp(eng_name, "Broccoli") == 0) strcpy(kor_name, "브로콜리");
-    else if (strcmp(eng_name, "Carrot") == 0) strcpy(kor_name, "당근");
-    else if (strcmp(eng_name, "Dandelion") == 0) strcpy(kor_name, "민들레");
-    else if (strcmp(eng_name, "Eggplant") == 0) strcpy(kor_name, "가지");
-    else if (strcmp(eng_name, "Fern") == 0) strcpy(kor_name, "고사리");
-    else if (strcmp(eng_name, "Garlic") == 0) strcpy(kor_name, "마늘");
-    else if (strcmp(eng_name, "Herb") == 0) strcpy(kor_name, "허브");
-    else if (strcmp(eng_name, "Iris") == 0) strcpy(kor_name, "붓꽃");
-    else if (strcmp(eng_name, "Jalapeno") == 0) strcpy(kor_name, "할라피뇨");
-    else if (strcmp(eng_name, "Kale") == 0) strcpy(kor_name, "케일");
-    else if (strcmp(eng_name, "Lettuce") == 0) strcpy(kor_name, "상추");
-    else if (strcmp(eng_name, "Mushroom") == 0) strcpy(kor_name, "버섯");
-    else if (strcmp(eng_name, "Nettle") == 0) strcpy(kor_name, "쐐기풀");
-    else if (strcmp(eng_name, "Onion") == 0) strcpy(kor_name, "양파");
-    else if (strcmp(eng_name, "Potato") == 0) strcpy(kor_name, "감자");
-    else if (strcmp(eng_name, "Quinoa") == 0) strcpy(kor_name, "퀴노아");
-    else if (strcmp(eng_name, "Radish") == 0) strcpy(kor_name, "무");
-    else if (strcmp(eng_name, "Spinach") == 0) strcpy(kor_name, "시금치");
-    else if (strcmp(eng_name, "Tomato") == 0) strcpy(kor_name, "토마토");
-    else if (strcmp(eng_name, "Ulluco") == 0) strcpy(kor_name, "울루코");
-    else if (strcmp(eng_name, "Vanilla") == 0) strcpy(kor_name, "바닐라");
-    else if (strcmp(eng_name, "Watercress") == 0) strcpy(kor_name, "물냉이");
-    else if (strcmp(eng_name, "Xylosma") == 0) strcpy(kor_name, "산유자나무");
-    else if (strcmp(eng_name, "Yam") == 0) strcpy(kor_name, "마");
-    else if (strcmp(eng_name, "Zucchini") == 0) strcpy(kor_name, "애호박");
-    
-    // 장비류
-    else if (strcmp(eng_name, "Land Deed") == 0) strcpy(kor_name, "텃밭 확장");
-    else if (strcmp(eng_name, "Fertilizer") == 0) strcpy(kor_name, "비료");
-    else if (strcmp(eng_name, "Pesticide") == 0) strcpy(kor_name, "농약");
-    else if (strcmp(eng_name, "Sprinkler") == 0) strcpy(kor_name, "스프링클러");
-    else if (strcmp(eng_name, "Scarecrow") == 0) strcpy(kor_name, "허수아비");
-    else if (strcmp(eng_name, "Placard") == 0) strcpy(kor_name, "플래카드");
-    
-    // 혹시 매칭 안 되는 게 있으면 원래 영어 이름 그대로 출력
-    else strcpy(kor_name, eng_name); 
-}
-
 void draw_info(Player *player, Store *item) {
     if (player->is_inventory_open && player->is_store_open) return;
 
     int start_y = 23, start_x = 45;
     int height = 12, width = 30; // 창 크기 고정
-    char subtitle[20];
 
-    // 1. 제목 및 색상 결정
-    strcpy(subtitle, " INFO ");
-    int color = 2; // 상점용 다른 색
-
-    // 2. 외곽 박스 그리기
-    attron(COLOR_PAIR(color));
+    // 박스 그리기
+    draw_box(start_y, start_x, height, width, 2, " INFO ");
     
-    // 상단 (제목 포함)
-    int title_len = strlen(subtitle);
-    int side_bar = (width - 2 - title_len) / 2;
-    
-    mvaddch(start_y, start_x, ACS_ULCORNER);
-    for(int i=0; i<side_bar; i++) addch(ACS_HLINE);
-    printw("%s", subtitle);
-    for(int i=0; i < (width - 2 - title_len - side_bar); i++) addch(ACS_HLINE);
-    addch(ACS_URCORNER);
-
-    // 몸통
-    for (int i = 1; i < height - 1; i++) {
-        mvaddch(start_y + i, start_x, ACS_VLINE);
-        for(int j=0; j < width - 2; j++) mvaddch(start_y + i, start_x + 1 + j, ' '); // 배경 지우기
-        mvaddch(start_y + i, start_x + width - 1, ACS_VLINE);
-    }
-
-    // 하단
-    mvaddch(start_y + height - 1, start_x, ACS_LLCORNER);
-    for (int i = 0; i < width - 2; i++) addch(ACS_HLINE);
-    addch(ACS_LRCORNER);
-    
-    attroff(COLOR_PAIR(color));
-
     // 정보 적기
-
-    // 한국어로
-    char kor_name[50];
-    get_korean_name(item->name, kor_name);
-
     attron(A_BOLD);
-    mvprintw(start_y + 2, start_x + 2, "%-16s", kor_name); 
+    mvprintw(start_y + 2, start_x + 2, "%-16s", item->kor_name); 
     attroff(A_BOLD);
 
     // 아이템 종류

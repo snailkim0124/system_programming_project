@@ -2,6 +2,9 @@
 #define COMMON_H
 
 #define MAX_ITEMS 20
+#define SHOP_ITEM_COUNT 32
+#define NUM_KEYS 74
+
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
@@ -15,6 +18,28 @@
 #include <math.h>
 #include <ncurses.h>
 #include <locale.h>
+
+
+typedef enum {
+    TYPE_SEED = 0,
+    TYPE_EQUIP,
+} ItemType;
+
+typedef enum {
+    ZONE0 = 0, ZONE1,
+    ZONE2, ZONE3
+} ZoneType;
+
+typedef struct {
+    char name[25];
+    char kor_name[25];
+    int buy_price;
+    int sell_price; 
+    int growth_time;
+    char explan[25];
+    ItemType item_type;
+    ZoneType zone;
+} Store;
 
 typedef struct {
     int y, x;        
@@ -61,5 +86,7 @@ typedef struct {
 } Player;
 
 extern Player player;
+extern Store shop_stock[];
+extern Key main_keyboard[];
 
 #endif
