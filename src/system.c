@@ -1,6 +1,7 @@
 #include "player.h"
 #include "render.h"
 #include "system.h"
+#include "weather.h"
 
 int game_tick = 0;
 

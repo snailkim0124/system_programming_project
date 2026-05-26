@@ -3,7 +3,7 @@ CFLAGS = -Wall -g -Iinclude
 LDFLAGS = -lncursesw -lm
 
 TARGET = farm_game
-SRCS = src/main.c src/render.c src/player.c src/save.c src/crop.c src/system.c src/game_data.c
+SRCS = src/main.c src/render.c src/player.c src/save.c src/crop.c src/system.c src/game_data.c src/weather.c
 OBJS = $(SRCS:.c=.o)
 
 $(TARGET): $(OBJS)

@@ -19,7 +19,6 @@
 #include <ncurses.h>
 #include <locale.h>
 
-
 typedef enum {
     TYPE_SEED = 0,
     TYPE_EQUIP,
@@ -88,5 +87,9 @@ typedef struct {
 extern Player player;
 extern Store shop_stock[];
 extern Key main_keyboard[];
+
+extern int now_weather;
+extern int now_wind;
+extern int now_temp;
 
 #endif
