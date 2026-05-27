@@ -6,7 +6,7 @@
 
 int shop_idx = 0;
 ItemType shop_now_tab = TYPE_SEED;
-int now_weather = 1;
+char now_weather[50] = "Clear";
 int now_wind = 0;
 int now_temp = 20;
 
@@ -49,12 +49,12 @@ int main() {
             if (count_down % 10 == 0) {
                 save_game(&player);
                 if (strlen(player.ast_msg) ==  0) strcpy(player.ast_msg, "자동 저장 완료!");
-                count_down = 0;
             }
             // 1분마다
             if (count_down % 60 == 0) {
                 // 날씨 체크
                 weather_is_what(&now_weather, &now_wind, &now_temp);
+                count_down = 0;
             }
         }
 

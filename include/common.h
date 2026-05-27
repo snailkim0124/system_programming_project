@@ -88,7 +88,7 @@ extern Player player;
 extern Store shop_stock[];
 extern Key main_keyboard[];
 
-extern int now_weather;
+extern char now_weather[50];
 extern int now_wind;
 extern int now_temp;
 

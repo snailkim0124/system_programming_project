@@ -209,7 +209,7 @@ void draw_single_key(Key* key, int highlighted) {
 }
 
 void draw_keyboard(int pressed_keycode) {
-    mvprintw(0, 2, "농장게임 (종료: ESC)");
+    mvprintw(0, 2, "텃밭.I/O (종료: ESC) / 날씨: %s / 온도: %d°C / 풍속: %d m/s", now_weather, now_temp, now_wind);
     
     for (int i = 0; i < NUM_KEYS; i++) {
         int is_pressed = (main_keyboard[i].keycode == pressed_keycode);

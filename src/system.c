@@ -31,6 +31,7 @@ void init_terminal() {
     timer.it_interval.tv_usec = 0;
     setitimer(ITIMER_REAL, &timer, NULL);
 
+    weather_is_what(now_weather, &now_wind, &now_temp); // 날씨 설정
     setlocale(LC_ALL, ""); // 한글 설정
     initscr();
     cbreak();             

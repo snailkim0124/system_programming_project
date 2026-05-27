@@ -14,7 +14,7 @@
 
 #define BUF_SIZE 4096
 
-void weather_is_what(int *out_weather, int *out_wind, int *out_temp);
+void weather_is_what(char *out_weather, int *out_wind, int *out_temp);
 int check_weather(char* weather);
 
 #endif

@@ -1,6 +1,7 @@
 #include "crop.h"
 #include "render.h"
 #include "common.h"
+#include "weather.h"
 
 int get_crop_growth_time(char* crop_name) {
     for (int i = 0; i < SHOP_ITEM_COUNT; i++) {
@@ -59,7 +60,7 @@ void update_crops() {
                 if (player.buff_pesticide_time <= 0 && !near_scarecrow && (now_temp <= 28)) pest_event(i);
 
                 // 비료 효과, 스프링쿨러 효과, 비옴
-                if (player.buff_fertilizer_time > 0 || near_sprinkler || now_weather == 2) {
+                if (player.buff_fertilizer_time > 0 || near_sprinkler || check_weather(now_weather) == 2) {
                     main_keyboard[i].growth_timer += 2; // 2배 빨라짐
                 }
                 else main_keyboard[i].growth_timer++; 

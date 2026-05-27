@@ -9,12 +9,16 @@ int check_weather(char* weather) {
         return 1;
     }
     else {
-        printf("맑음\n");
         return 0;
     }
 }
 
-void weather_is_what(int *out_weather, int *out_wind, int *out_temp) {
+void weather_is_what(char *out_weather, int *out_wind, int *out_temp) {
+    // 기본 세팅
+    strcpy(out_weather, "Clear");
+    *out_wind = 0;
+    *out_temp = 20;
+
     // 대구 날씨 api 받아오기
     int server_fd;
     struct sockaddr_in server_addr;
@@ -50,29 +54,30 @@ void weather_is_what(int *out_weather, int *out_wind, int *out_temp) {
         if(req2 != NULL) {
             req2 += 4;
             req2[strcspn(req2, "\r\n")] = '\0';
-            char *weather = strtok(req2, "_");;
+
+            char *weather = strtok(req2, "_");
             char *wind = strtok(NULL, "_");
             char *temp = strtok(NULL, "_");
 
             if(weather != NULL && wind != NULL && temp != NULL) {
-                *out_weather = check_weather(weather);
+                strcpy(out_weather, weather);
             
                 // 숫자만 뽑기
                 for(int i = 0; wind[i] != '\0'; i++) {
-                    if(isdigit(wind[i])) {
+                    if(wind[i] >= '0' && wind[i] <= '9') {
                         *out_wind = atoi(&wind[i]);
                         break;
                     }
                 }
 
                 for(int i = 0; temp[i] != '\0'; i++) {
-                    if(isdigit(temp[i]) || temp[i] == '+' || temp[i] == '-') {
+                    if((temp[i] >= '0' && temp[i] <= '9') || temp[i] == '+' || temp[i] == '-') {
                         *out_temp = atoi(&temp[i]);
                         break;
                     }
                 }
                 
-                // printf("weather: %d, wind: %d, temp: %d\n", *out_weather, *out_wind, *out_temp);
+                // printf("weather: %s, wind: %d, temp: %d\n", out_weather, *out_wind, *out_temp);
             }
         }
     }
