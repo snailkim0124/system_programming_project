@@ -7,15 +7,15 @@ Player player;
 
 void player_init() {
     // 실제
-    player.unlocked_zone = 0;
-    player.inv.money = 15;
+    // player.unlocked_zone = 0;
+    // player.inv.money = 15;
 
     // 디버그용
-    // player.is_remove_open = false;
-    // player.is_inventory_open = false;
-    // player.is_store_open = false;
-    // player.inv.money = 200000;
-    // strcpy(player.ast_msg, "");
+    player.is_remove_open = false;
+    player.is_inventory_open = false;
+    player.is_store_open = false;
+    player.inv.money = 200000;
+    strcpy(player.ast_msg, "");
 
     load_game(&player); // 시작할 때 불러오기
     player.is_store_open = false;
