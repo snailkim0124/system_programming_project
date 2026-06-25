@@ -5,7 +5,7 @@
 실제 키보드 배열과 똑같이 매칭된 텃밭에 씨앗을 심고, 농기구를 배치하며, 쉴 새 없이 덮쳐오는 병충해를 물리쳐 나만의 풍성한 농장을 만들어보세요!
 
 * **메인 화면 및 밭 UI**
-  ![Main UI](./images/game_screenshot.jpg)
+  <img src="./images/game_screenshot.jpg" width="50%">
 
 ## ✨ 주요 기능
 
