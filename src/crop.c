@@ -57,7 +57,7 @@ void update_crops() {
                 int near_scarecrow = check_near_equip(i, 98);
                 
                 // 농약 효과, 허수아비 효과, 28도 이하인 경우
-                if (player.buff_pesticide_time <= 0 && !near_scarecrow && (now_temp <= 28)) pest_event(i);
+                if (main_keyboard[i].is_harm == 0 && player.buff_pesticide_time <= 0 && !near_scarecrow && (now_temp <= 28)) pest_event(i);
 
                 // 비료 효과, 스프링쿨러 효과, 비옴
                 if (player.buff_fertilizer_time > 0 || near_sprinkler || check_weather(now_weather) == 2) {

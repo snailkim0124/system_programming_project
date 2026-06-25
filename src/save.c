@@ -71,9 +71,8 @@ void load_game(Player *p) {
                     main_keyboard[i].crop_state += stage;
 
                     if (main_keyboard[i].crop_state >= 5) {
-
-                        // 방치된 시간
-                        int unattended_time = elapsed_now - time_to_max;
+                        // 방치된 시간 (스프링쿨러 보정)
+                        int unattended_time = elapsed_now - (near_sprinkler ? (time_to_max / 2) : time_to_max);
 
                         if (unattended_time >= 30) {
                             main_keyboard[i].crop_state = 6;

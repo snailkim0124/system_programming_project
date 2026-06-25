@@ -3,6 +3,7 @@
 #include "crop.h"
 #include "save.h"
 #include "system.h"
+#include "weather.h"
 
 int shop_idx = 0;
 ItemType shop_now_tab = TYPE_SEED;
